@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AAPT SM26 Poster — Eichenlaub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {delimiters:[{left:'$',right:'$',display:false}]});"></script>
+<style>
+  @page { size: 48in 36in; margin: 0; }
+  :root {
+    --navy: #1b365d;
+    --navy-soft: #2c4a75;
+    --green: #61ad00;
+    --lightgreen: #c5dc6f;
+    --paper: #ffffff;
+    --panel: #f0f3f7;
+    --ink: #22303f;
+    --muted: #5a6b7e;
+    --red: #c0392b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 48in; height: 36in; }
+  body {
+    font-family: "Archivo", sans-serif; color: var(--ink); background: var(--paper);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* ============ HEADER ============ */
+  header {
+    background: var(--navy); color: #fff; height: 3.85in; flex: 0 0 auto;
+    display: flex; align-items: center; gap: 1in; padding: 0 0.8in;
+    border-bottom: 0.16in solid var(--green);
+  }
+  header .titleblock { flex: 1 1 auto; }
+  header h1 { font-size: 96pt; font-weight: 800; line-height: 1.08; letter-spacing: -0.01em; }
+  header h1 .accent { color: var(--lightgreen); }
+  header .authors { margin-top: 0.22in; font-size: 38pt; font-weight: 500; opacity: 0.95; }
+  header .authors b { font-weight: 700; }
+  header .meetingblock { flex: 0 0 auto; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.18in; }
+  header .meetingblock img.logo { height: 1.35in; }
+  header .meetingblock .meeting { font-size: 27pt; opacity: 0.9; }
+
+  /* ============ BODY GRID ============ */
+  main {
+    flex: 1 1 auto; display: flex; gap: 0.42in; padding: 0.5in 0.55in 0.4in;
+    min-height: 0;
+  }
+  .rail { flex: 0 0 8.55in; display: flex; flex-direction: column; gap: 0.42in; min-height: 0; }
+  .rail .panel { flex: 1 1 auto; }
+  .center { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.4in; min-height: 0; }
+  .cardrow { flex: 1 1 0; display: flex; gap: 0.4in; min-height: 0; }
+
+  .panel {
+    background: var(--panel); border-radius: 0.22in; padding: 0.38in 0.42in;
+    border-top: 0.1in solid var(--navy);
+  }
+  .panel.green { border-top-color: var(--green); }
+  .panel h2 { font-size: 40pt; font-weight: 800; color: var(--navy); margin-bottom: 0.18in; line-height: 1.1; }
+  .panel p { font-size: 24.5pt; line-height: 1.36; }
+  .panel p + p { margin-top: 0.16in; }
+  .panel .big { font-size: 27pt; font-weight: 600; }
+
+  /* find-the-blank graphic */
+  .findstack { margin-top: 0.22in; font-family: "Source Serif 4", serif; font-style: italic; }
+  .findstack div { font-size: 25pt; color: var(--muted); padding: 0.045in 0; }
+  .findstack div:nth-child(2) { opacity: 0.75; }
+  .findstack div:nth-child(3) { opacity: 0.55; }
+  .findstack div:nth-child(4) { opacity: 0.38; }
+  .findstack div:nth-child(5) { opacity: 0.24; }
+
+  /* answer-format table */
+  .fmt-table { margin-top: 0.1in; }
+  .fmt-table .row { display: flex; align-items: baseline; padding: 0.115in 0; border-bottom: 2px solid #dbe2ea; }
+  .fmt-table .row:last-child { border-bottom: 0; }
+  .fmt-table .a { flex: 0 0 46%; font-weight: 700; font-size: 23.5pt; color: var(--navy); }
+  .fmt-table .b { flex: 1; font-size: 23.5pt; }
+  .fmt-caption { margin-top: 0.14in; font-size: 20pt; color: var(--muted); }
+
+  .caveat {
+    margin-top: 0.2in; background: #fff; border-left: 0.12in solid var(--lightgreen);
+    border-radius: 0 0.12in 0.12in 0; padding: 0.18in 0.24in; font-size: 22.5pt; line-height: 1.32;
+  }
+
+  /* ============ PROBLEM CARDS ============ */
+  .card {
+    flex: 1 1 0; background: #fff; border: 3px solid #d5dde6; border-radius: 0.22in;
+    padding: 0.3in 0.34in; display: flex; flex-direction: column; min-height: 0;
+    box-shadow: 0 0.04in 0.12in rgba(27,54,93,0.07);
+  }
+  .kicker {
+    align-self: flex-start; background: var(--green); color: #fff; font-weight: 800;
+    font-size: 21pt; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.06in 0.22in; border-radius: 99px;
+  }
+  .course { font-size: 18.5pt; color: var(--muted); margin-top: 0.1in; }
+  .card h3 { font-size: 33pt; font-weight: 800; color: var(--navy); margin-top: 0.06in; line-height: 1.12; }
+  .prob {
+    font-family: "Source Serif 4", serif; font-size: 22.5pt; line-height: 1.34; margin-top: 0.14in;
+  }
+  .prob .choicepair { display: block; margin-top: 0.06in; padding-left: 0.25in; }
+  .card figure { margin: 0.18in 0 0; text-align: center; flex: 1 1 auto; min-height: 0;
+                 display: flex; align-items: center; justify-content: center; }
+  .card figure img { max-width: 100%; max-height: 100%; }
+  .fmt-chip {
+    align-self: flex-start; margin-top: 0.16in; border: 3px solid var(--navy); color: var(--navy);
+    font-weight: 700; font-size: 19.5pt; padding: 0.05in 0.2in; border-radius: 99px; background: #fff;
+  }
+  .note {
+    margin-top: 0.16in; background: #f4f9e7; border-left: 0.1in solid var(--green);
+    border-radius: 0 0.12in 0.12in 0; padding: 0.15in 0.2in; font-size: 20.5pt; line-height: 1.3;
+  }
+  .note b { color: var(--navy); }
+
+  /* Dr. Vacuum bins mock */
+  .binmock { display: grid; grid-template-columns: 1fr 1fr; gap: 0.14in; margin-top: 0.18in; }
+  .binmock .bin { border: 3px dashed #9fb0c3; border-radius: 0.14in; padding: 0.1in; background: #fbfcfe; }
+  .binmock .bin h4 { font-size: 20pt; color: var(--navy); text-align: center; margin-bottom: 0.07in; }
+  .binmock .chip {
+    display: inline-block; border: 2.5px solid var(--navy); color: var(--navy); background: #fff;
+    font-size: 17.5pt; font-weight: 600; border-radius: 99px; padding: 0.03in 0.13in; margin: 0.025in;
+  }
+
+  /* stuck-students speech bubbles */
+  .bubbles { margin-top: 0.18in; display: flex; flex-direction: column; gap: 0.16in; }
+  .bubblerow { display: flex; align-items: center; gap: 0.12in; }
+  .bubble {
+    flex: 1 1 55%; background: #eef1f6; border-radius: 0.16in; padding: 0.12in 0.18in;
+    font-family: "Source Serif 4", serif; font-style: italic; font-size: 19.5pt; line-height: 1.25; position: relative;
+  }
+  .arrow { flex: 0 0 auto; color: var(--green); font-size: 30pt; font-weight: 800; }
+  .step {
+    flex: 1 1 45%; border: 3px solid var(--green); border-radius: 0.14in; padding: 0.1in 0.15in;
+    font-size: 18.5pt; font-weight: 700; color: var(--navy); background: #f7fbee; text-align: center;
+  }
+
+  /* cradle multi-select mock */
+  .opts { margin-top: 0.16in; display: flex; flex-direction: column; gap: 0.1in; }
+  .opt { display: flex; gap: 0.14in; align-items: flex-start; font-size: 19.5pt; line-height: 1.25; }
+  .opt .box {
+    flex: 0 0 auto; width: 0.32in; height: 0.32in; border: 3.5px solid var(--navy); border-radius: 0.06in;
+    margin-top: 0.03in; display: flex; align-items: center; justify-content: center;
+    font-size: 21pt; font-weight: 800; color: var(--green);
+  }
+  .opt.sel .box { border-color: var(--green); background: #f0f8df; }
+  .opt.sel { font-weight: 600; }
+
+  /* ============ SURVEY STRIP ============ */
+  .strip {
+    flex: 0 0 4.55in; background: var(--panel); border-radius: 0.22in; border-top: 0.1in solid var(--navy);
+    padding: 0.26in 0.36in; display: flex; flex-direction: column; min-height: 0;
+  }
+  .strip h2 { font-size: 33pt; font-weight: 800; color: var(--navy); margin-bottom: 0.16in; }
+  .minis { flex: 1 1 auto; display: flex; gap: 0.32in; min-height: 0; }
+  .mini { flex: 1 1 0; display: flex; flex-direction: column; min-height: 0; }
+  .mini .thumb { flex: 0 0 1.9in; display: flex; align-items: center; justify-content: center; gap: 0.06in; }
+  .mini .thumb img { max-height: 1.9in; max-width: 100%; border-radius: 0.08in; }
+  .mini .thumb img.multi { max-width: 32%; }
+  .mini .thumb .txtart {
+    font-family: "Source Serif 4", serif; font-size: 30pt; color: var(--navy); text-align: center; line-height: 1.3;
+  }
+  .mini p { font-size: 18.5pt; line-height: 1.28; margin-top: 0.12in; }
+  .mini p b { color: var(--navy); }
+
+  /* ============ RIGHT RAIL SPECIFICS ============ */
+  .verbs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.06in 0.25in; margin-top: 0.12in; }
+  .verbs div { font-size: 21.5pt; padding: 0.045in 0; }
+  .verbs div::before { content: "✓ "; color: var(--green); font-weight: 800; }
+  .verbs div.calc::before { content: "≡ "; color: var(--muted); }
+  .verbs div.calc { color: var(--muted); }
+
+  .principles { counter-reset: pr; margin-top: 0.08in; }
+  .principles li {
+    list-style: none; counter-increment: pr; font-size: 21.5pt; line-height: 1.28;
+    padding: 0.1in 0 0.1in 0.62in; position: relative; border-bottom: 2px solid #dbe2ea;
+  }
+  .principles li:last-child { border-bottom: 0; }
+  .principles li::before {
+    content: counter(pr); position: absolute; left: 0; top: 0.1in;
+    width: 0.44in; height: 0.44in; background: var(--navy); color: #fff; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20pt;
+  }
+  .principles b { color: var(--navy); }
+
+  .qrpanel { background: var(--navy); border-top-color: var(--green); flex: 1 1 auto; }
+  .qrpanel h2 { color: #fff; }
+  .qrrow { display: flex; align-items: center; gap: 0.3in; margin-top: 0.22in; }
+  .qrrow .qrbox { flex: 0 0 auto; background: #fff; border-radius: 0.14in; padding: 0.09in; }
+  .qrrow img { width: 1.72in; height: 1.72in; display: block; }
+  .qrrow .lbl { color: #fff; font-size: 23pt; font-weight: 700; line-height: 1.25; }
+  .qrrow .lbl span { display: block; font-weight: 400; font-size: 18.5pt; opacity: 0.8; margin-top: 0.04in; }
+
+  /* ============ FOOTER ============ */
+  footer {
+    flex: 0 0 0.78in; background: var(--panel); border-top: 3px solid #d5dde6;
+    display: flex; align-items: center; justify-content: center; gap: 0.5in;
+    font-size: 17.5pt; color: var(--muted); padding: 0 0.6in; text-align: center;
+  }
+  footer b { color: var(--navy); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="titleblock">
+    <h1>Auto-Graded Homework that Invites Students to <span class="accent" style="white-space:nowrap">Think Broadly</span></h1>
+    <div class="authors"><b>Mark Eichenlaub</b> · Art of Problem Solving</div>
+  </div>
+  <div class="meetingblock">
+    <img class="logo" src="assets/logos/company/PNG/AoPS-Logo-Horizontal-White.png" alt="Art of Problem Solving">
+    <div class="meeting">AAPT Summer Meeting 2026 · Pasadena, CA</div>
+  </div>
+</header>
+
+<main>
+  <!-- ================= LEFT RAIL ================= -->
+  <div class="rail">
+    <div class="panel">
+      <h2>The default ask: "find the number"</h2>
+      <p>Homework that grades itself usually presents a scenario and asks for one quantity.
+         Such problems build mastery and tenacity — but a steady diet of them trains a
+         narrow, procedural picture of what doing physics <i>is</i>:
+         pick the equation, plug in, solve.</p>
+      <div class="findstack">
+        <div>Find the tension in the rope.</div>
+        <div>Find the time to reach the ground.</div>
+        <div>Find the final speed.</div>
+        <div>Find the distance traveled.</div>
+        <div>Find the …</div>
+      </div>
+    </div>
+
+    <div class="panel green">
+      <h2>The grader isn't the limit — the question format is</h2>
+      <p class="big">An auto-grader can check any answer with a well-defined key —
+         not just numbers.</p>
+      <p>Change <i>what you ask for</i>, and the same instant-feedback machinery invites the
+         patterns of thought we prize in rich human-feedback settings: designing experiments,
+         choosing models, weighing evidence, critiquing calculations, diagnosing errors.</p>
+    </div>
+
+    <div class="panel">
+      <h2>If the answer is ___, the thinking is ___</h2>
+      <div class="fmt-table">
+        <div class="row"><div class="a">a number ± tolerance</div><div class="b">execute a plan</div></div>
+        <div class="row"><div class="a">items sorted into bins</div><div class="b">apply a criterion consistently</div></div>
+        <div class="row"><div class="a">two columns connected</div><div class="b">map structure onto structure</div></div>
+        <div class="row"><div class="a">all-that-apply choices</div><div class="b">judge each claim on its own</div></div>
+        <div class="row"><div class="a">a click on the image</div><div class="b">commit to a spatial prediction</div></div>
+        <div class="row"><div class="a">a ranking</div><div class="b">compare cases without computing</div></div>
+      </div>
+      <div class="fmt-caption">Every format above runs auto-graded in AoPS Online courses today.
+        The six problems at right are real homework, shown with their grading formats.</div>
+    </div>
+  </div>
+
+  <!-- ================= CENTER: 6 CARDS + STRIP ================= -->
+  <div class="center">
+    <div class="cardrow">
+
+      <div class="card">
+        <span class="kicker">Design an experiment</span>
+        <div class="course">Physics 1: Mechanics · Acceleration</div>
+        <h3>Make the Atwood machine measure&nbsp;g</h3>
+        <p class="prob">You've modeled an Atwood machine's acceleration in terms of
+          $r = m_L/m_H$. Now design an accurate experiment to measure $g$ with it, using a stopwatch.
+          For each pair of design choices, which gives a <i>more accurate</i> experiment?
+          <span class="choicepair">• start the heavy box at the top — or halfway down?</span>
+          <span class="choicepair">• a single value of $r$ — or many?</span>
+          <span class="choicepair">• one trial per $r$ — or several?</span>
+        </p>
+        <figure><img src="asy/atwood.svg" alt="Two Atwood machine setups" style="width:78%; max-height:5in"></figure>
+        <span class="fmt-chip">answer = drag each choice into a bin</span>
+        <div class="note"><b>What students are doing:</b> weighing longer timing windows,
+          model-stressing ranges, and repeated trials — experimental-design judgment,
+          graded with no paragraphs.</div>
+      </div>
+
+      <div class="card">
+        <span class="kicker">Interpret graphs</span>
+        <div class="course">Physics 1: Mechanics · Forms of Energy</div>
+        <h3>A peregrine falcon dives</h3>
+        <p class="prob">A falcon dives from rest, approaching terminal velocity as air drag
+          builds. Match each plot to the quantity it shows as a function of time:
+          <b>height</b>, <b>speed</b>, or <b>magnitude of acceleration</b>.</p>
+        <figure><img src="asy/falcon.svg" alt="Three unlabeled curves versus time" style="width:96%; max-height:3.9in"></figure>
+        <span class="fmt-chip">answer = connect the columns</span>
+        <div class="note"><b>What students are doing:</b> translating a physical story into
+          qualitative features of curves — speed saturates, acceleration starts at $g$ and dies away,
+          height falls with steepening slope. No numbers come out, and only one matching survives.</div>
+      </div>
+
+      <div class="card">
+        <span class="kicker">Commit to a prediction</span>
+        <div class="course">Introduction to Physics · Conservation Laws</div>
+        <h3>Where does Galileo's pendulum stop?</h3>
+        <p class="prob">A pendulum released from $C$ swings through $B$, where the string
+          catches on a peg at $E$ and the bob swings on around the peg.
+          <b>Click the point in the image</b> where the bob stops and turns around.
+          (The point isn't necessarily labeled.)</p>
+        <figure><img src="asy/pendulum_click_vector.svg" alt="Pendulum with peg" style="width:64%; max-height:4.6in"></figure>
+        <span class="fmt-chip">answer = a click on the image</span>
+        <div class="note"><b>What students are doing:</b> turning energy conservation into a
+          <i>spatial</i> commitment — same release height, but on the tighter circle around the peg.
+          Clicking $D$ (same height, wrong circle) is a graded near-miss: right law, wrong constraint.</div>
+      </div>
+    </div>
+
+    <div class="cardrow">
+
+      <div class="card">
+        <span class="kicker">Weigh evidence</span>
+        <div class="course">Introduction to Physics · Thought Experiments</div>
+        <h3>Which hypothesis does each observation support?</h3>
+        <p class="prob">Galileo: all objects accelerate alike under gravity.
+          Prof. Impetus (fictional): denser objects accelerate faster.
+          Dr. Vacuum evaluates the evidence — but <i>never considers air drag</i>.
+          Sort each observation by which hypothesis <b>Dr. Vacuum</b> will think it supports.</p>
+        <div class="binmock">
+          <div class="bin"><h4>Galileo</h4>
+            <span class="chip">Kepler's laws</span><span class="chip">hammer &amp; feather, Moon</span><span class="chip">balloon falls on Moon</span></div>
+          <div class="bin"><h4>Impetus</h4>
+            <span class="chip">crumpled paper falls faster</span><span class="chip">He balloon rises</span></div>
+          <div class="bin"><h4>Both</h4>
+            <span class="chip">lead balls land together</span></div>
+          <div class="bin"><h4>Neither</h4>
+            <span class="chip">skydiver, head-first</span></div>
+        </div>
+        <span class="fmt-chip">answer = drag observations into bins</span>
+        <div class="note"><b>What students are doing:</b> modeling a <i>flawed</i> reasoner's
+          inferences — separating what an experiment seems to show from what it shows.
+          Metacognition, graded as a partition.</div>
+      </div>
+
+      <div class="card">
+        <span class="kicker">Diagnose a stuck solver</span>
+        <div class="course">Introduction to Physics · Problem Solving</div>
+        <h3>What should each student try next?</h3>
+        <p class="prob">Five students are stuck on the classic string-around-the-Earth puzzle.
+          Match each student's statement to their most productive next step.</p>
+        <div class="bubbles">
+          <div class="bubblerow">
+            <div class="bubble">"I don't understand this problem at all. I don't know where to start."</div>
+            <div class="arrow">→</div>
+            <div class="step">Restate it: what's unknown? what's given?</div>
+          </div>
+          <div class="bubblerow">
+            <div class="bubble">"My answer is $10^{12}$ m — bigger than Earth itself. Something seems wrong."</div>
+            <div class="arrow">→</div>
+            <div class="step">Check your methods and calculations</div>
+          </div>
+          <div class="bubblerow">
+            <div class="bubble">"I know it's about circumference, but I don't know what to do next."</div>
+            <div class="arrow">→</div>
+            <div class="step">Solve an easier related problem</div>
+          </div>
+        </div>
+        <span class="fmt-chip">answer = connect the columns</span>
+        <div class="note"><b>What students are doing:</b> classifying <i>kinds of stuckness</i>
+          and prescribing remedies — reasoning about the problem-solving process itself.
+          Pólya, auto-graded.</div>
+      </div>
+
+      <div class="card">
+        <span class="kicker">Interpret a calculation</span>
+        <div class="course">Physics 1: Mechanics · Collisions</div>
+        <h3>The calculation disagrees with the cradle</h3>
+        <p class="prob">For Newton's cradle, momentum + energy conservation alone predict
+          something different from what the demo shows. Which interpretations are accurate?</p>
+        <figure style="flex:0 0 auto"><img src="asy/cradle.svg" alt="Newton's cradle" style="max-height:2.45in"></figure>
+        <div class="opts">
+          <div class="opt"><span class="box"></span><span>Momentum or energy must not actually be conserved in the collisions.</span></div>
+          <div class="opt sel"><span class="box">✓</span><span>Elastic collisions + momentum conservation are a good model — but not <i>enough</i>; more modeling assumptions are needed.</span></div>
+          <div class="opt sel"><span class="box">✓</span><span>The observed outcome is one solution of the conservation equations; there are many others.</span></div>
+          <div class="opt"><span class="box"></span><span>The cradle can't be modeled — only experiment can tell us what happens.</span></div>
+        </div>
+        <span class="fmt-chip">answer = select all that apply</span>
+        <div class="note"><b>What students are doing:</b> deciding what a calculation does and
+          doesn't show — built around a case where theory and demo <i>disagree</i>.</div>
+      </div>
+    </div>
+
+    <!-- ============ SURVEY STRIP ============ -->
+    <div class="strip">
+      <h2>…and more, from a 28-problem survey across four AoPS physics courses</h2>
+      <div class="minis">
+        <div class="mini">
+          <div class="thumb">
+            <img class="multi" src="assets/img/shadow_circle.jpg" alt="circular shadow">
+            <img class="multi" src="assets/img/shadow_oval.jpg" alt="oval shadow">
+            <img class="multi" src="assets/img/shadow_line.jpg" alt="line shadow">
+          </div>
+          <p><b>Reason with symmetry.</b> Spin or roll a sphere — which actions change its shadow?
+             Mostly: none. (Middle School Physics)</p>
+        </div>
+        <div class="mini">
+          <div class="thumb"><img src="asy/balloons.svg" alt="balloons in accelerating car" style="max-height:1.8in"></div>
+          <p><b>Predict the counterintuitive.</b> Accelerate the car: the helium balloon leans
+             <i>forward</i>. (Mechanics · Fluid Statics)</p>
+        </div>
+        <div class="mini">
+          <div class="thumb">
+            <img class="multi" src="assets/img/moon_left.jpg" alt="left-lit moon" style="max-width:44%">
+            <img class="multi" src="assets/img/moon_right.jpg" alt="right-lit moon" style="max-width:44%">
+          </div>
+          <p><b>Reason in 3-D.</b> Which quarter moon rises at sunset, and which at noon?
+             Pure spatial reasoning, graded as a match. (Intro to Physics)</p>
+        </div>
+        <div class="mini">
+          <div class="thumb"><img src="asy/parachute_fbd.svg" alt="three free-body diagrams" style="max-height:1.85in"></div>
+          <p><b>Read a diagram quantitatively.</b> Which free-body diagram is terminal velocity —
+             and which is the chute just opening? Arrow <i>lengths</i> carry the physics. (Mechanics)</p>
+        </div>
+        <div class="mini">
+          <div class="thumb"><div class="txtart">$\bar{q}$ &nbsp; $\Delta q$ &nbsp; $q = a \pm b$<br>⇕<br>meanings</div></div>
+          <p><b>Read notation as language.</b> Match decorations on $q$ to what they say.
+             Implicit literacy, made explicit. (Intro to Physics)</p>
+        </div>
+        <div class="mini">
+          <div class="thumb"><div class="txtart">$T = 2\pi\sqrt{\ell/g}$<br>plot $T^2$ vs. $\ell$<br>⇒ slope $= 4\pi^2\!/g$</div></div>
+          <p><b>Linearize real data.</b> Choose axes that straighten pendulum data, then read
+             $g$ off the slope — the working scientist's workflow. (Intro to Physics)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RIGHT RAIL ================= -->
+  <div class="rail">
+    <div class="panel">
+      <h2>What are students doing?</h2>
+      <p>Calculating is one row of this table — not the whole table:</p>
+      <div class="verbs">
+        <div class="calc">apply known equations</div>
+        <div>design a measurement</div>
+        <div>interpret graphs &amp; data</div>
+        <div>build &amp; choose models</div>
+        <div>critique an argument</div>
+        <div>weigh evidence</div>
+        <div>interpret an equation</div>
+        <div>diagnose an error</div>
+        <div>estimate from experience</div>
+        <div>reason about symmetry</div>
+        <div>read &amp; use notation</div>
+        <div>reflect on learning</div>
+      </div>
+      <p style="margin-top:0.16in; font-size:20.5pt; color:var(--muted);">
+        Every verb above appears in the 28 surveyed problems — each one auto-graded.</p>
+    </div>
+
+    <div class="panel green">
+      <h2>Design principles that emerged</h2>
+      <ol class="principles">
+        <li><b>Grade a decision, not a derivation.</b> Bins, matches, and clicks capture judgments directly.</li>
+        <li><b>Put the misconception in the answer key.</b> A wrong bin is a diagnosis ("lighter" at the valley bottom).</li>
+        <li><b>Ask about someone else's thinking.</b> Flawed reasoners and stuck students invite metacognition.</li>
+        <li><b>Let the diagram be the answer.</b> Click-on-image makes a spatial claim gradable.</li>
+        <li><b>Use cases where the model fails.</b> Interpreting a calculation is a gradable skill.</li>
+        <li><b>Structure prevents lucky guessing.</b> Forced pairs and one-to-one matches discipline the format.</li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <h2>What still needs humans</h2>
+      <p>Proofs, lab write-ups, open design projects, and reflective writing need expert and peer
+         feedback — nuance no key can hold. The claim here is narrower: the <i>graded</i> part of
+         homework can invite the same patterns of thought, so the procedural diet isn't the default.</p>
+    </div>
+
+    <div class="panel qrpanel">
+      <h2>Take it with you</h2>
+      <div class="qrrow">
+        <div class="qrbox"><img src="assets/qr/qr_poster.svg" alt="QR: poster"></div>
+        <div class="lbl">This poster + materials<span>markeichenlaub.github.io/aapt-sm26-poster</span></div>
+      </div>
+      <div class="qrrow">
+        <div class="qrbox"><img src="assets/qr/qr_try.svg" alt="QR: try the problems"></div>
+        <div class="lbl">Try these problems, live<span>four auto-graded demos in your browser</span></div>
+      </div>
+      <div class="qrrow">
+        <div class="qrbox"><img src="assets/qr/qr_aops.svg" alt="QR: AoPS Online"></div>
+        <div class="lbl">AoPS Online<span>artofproblemsolving.com/online</span></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div>Problems © Art of Problem Solving — <b>Introduction to Physics</b> · <b>Physics 1: Mechanics</b> ·
+    <b>Middle School Physics</b> &nbsp;·&nbsp; Moon photographs: NASA &nbsp;·&nbsp;
+    Diagrams: course Asymptote sources &nbsp;·&nbsp; Contact: mark.d.eichenlaub@gmail.com</div>
+</footer>
+
+</body>
+</html>

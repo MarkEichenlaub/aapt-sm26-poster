@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try the Problems — Auto-Graded Homework that Invites Students to Think Broadly</title>
+<style>
+  :root {
+    --navy: #1b365d;
+    --green: #61ad00;
+    --lightgreen: #c5dc6f;
+    --paper: #f7f8fa;
+    --ink: #22303f;
+    --red: #c0392b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height: 1.45;
+  }
+  header {
+    background: var(--navy); color: #fff; padding: 28px 20px 22px;
+  }
+  header .wrap, main { max-width: 880px; margin: 0 auto; }
+  header h1 { margin: 0 0 6px; font-size: 1.5rem; }
+  header p { margin: 0; opacity: 0.85; font-size: 0.98rem; }
+  header a { color: var(--lightgreen); }
+  main { padding: 10px 16px 60px; }
+  section.card {
+    background: #fff; border: 1px solid #dde3ea; border-radius: 12px;
+    padding: 22px 24px; margin: 26px 0; box-shadow: 0 1px 4px rgba(27,54,93,0.08);
+  }
+  .kicker {
+    display:inline-block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #fff; background: var(--green);
+    padding: 3px 10px; border-radius: 99px; margin-bottom: 8px;
+  }
+  .coursechip { font-size: 0.8rem; color: #5a6b7e; margin-left: 8px; }
+  h2 { margin: 4px 0 10px; font-size: 1.2rem; color: var(--navy); }
+  .prompt { margin: 6px 0 14px; }
+  figure { margin: 12px 0; text-align: center; }
+  figure img, figure svg { max-width: 100%; height: auto; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; min-height: 40px;
+           padding: 8px; border-radius: 8px; background: #eef1f5; }
+  .chip {
+    background: #fff; border: 2px solid var(--navy); color: var(--navy);
+    padding: 5px 12px; border-radius: 99px; cursor: pointer; user-select: none;
+    font-weight: 600; font-size: 0.92rem;
+  }
+  .chip.selected { background: var(--navy); color: #fff; }
+  .chip.right { border-color: var(--green); background: #eef7e0; }
+  .chip.wrong { border-color: var(--red); background: #fdeceb; }
+  .bins { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .bin {
+    border: 2px dashed #9fb0c3; border-radius: 10px; padding: 8px; min-height: 86px;
+    background: #fbfcfe; cursor: pointer;
+  }
+  .bin h3 { margin: 0 0 6px; font-size: 0.95rem; color: var(--navy); text-align: center; }
+  .bin .content { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .controls { margin-top: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  button {
+    font: inherit; font-weight: 700; border: 0; border-radius: 8px; cursor: pointer;
+    padding: 9px 18px; background: var(--navy); color: #fff;
+  }
+  button.secondary { background: #e4e9f0; color: var(--navy); }
+  .verdict { font-weight: 700; }
+  .verdict.good { color: var(--green); }
+  .verdict.bad { color: var(--red); }
+  .expert {
+    margin-top: 12px; border-left: 4px solid var(--lightgreen); background: #f6faec;
+    padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 0.95rem; display: none;
+  }
+  .expert.show { display: block; }
+  /* column connect */
+  .connect { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 90px; }
+  .connect svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .colitem {
+    border: 2px solid var(--navy); color: var(--navy); border-radius: 10px; padding: 8px 12px;
+    background: #fff; cursor: pointer; font-weight: 600; margin: 6px 0; text-align: center;
+  }
+  .colitem.selected { background: var(--navy); color: #fff; }
+  /* click image */
+  .clickwrap { position: relative; display: inline-block; cursor: crosshair; }
+  .clickwrap img { display: block; max-width: 100%; }
+  .marker {
+    position: absolute; width: 22px; height: 22px; border-radius: 50%;
+    border: 3px solid var(--red); background: rgba(192,57,43,0.25);
+    transform: translate(-50%, -50%); pointer-events: none; display: none;
+  }
+  .checkrow { display: flex; gap: 10px; align-items: center; margin: 6px 0; }
+  footer { text-align: center; color: #5a6b7e; font-size: 0.85rem; padding: 30px 10px 40px; }
+  footer a { color: var(--navy); }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Try the Problems</h1>
+    <p>Live, auto-graded re-implementations of four homework problems from the poster
+      <em>Auto-Graded Homework that Invites Students to Think Broadly</em> —
+      Mark Eichenlaub, Art of Problem Solving · AAPT Summer Meeting 2026, Pasadena.
+      <a href="../">Back to the poster page</a></p>
+  </div>
+</header>
+<main>
+
+<!-- ===================== 1. HILLY ROAD (drag/tap into bins) ===================== -->
+<section class="card" id="road">
+  <span class="kicker">Survey a scenario</span><span class="coursechip">Physics 1: Mechanics · Circular Motion</span>
+  <h2>Heavier, lighter, or normal?</h2>
+  <p class="prompt">A car drives along a hilly road <strong>at constant speed</strong> (side view below).
+    At each labeled point, does the driver feel heavier than, the same as, or lighter than their normal weight?
+    <em>Tap a label, then tap a bin.</em></p>
+  <figure><img src="../asy/road.svg" alt="Side view of a hilly road with points A through E" style="width:min(640px,100%)"></figure>
+  <div class="chips" id="road-tray"></div>
+  <div class="bins" id="road-bins"></div>
+  <div class="controls">
+    <button onclick="checkBins('road')">Check my answer</button>
+    <button class="secondary" onclick="resetBins('road')">Reset</button>
+    <span class="verdict" id="road-verdict"></span>
+  </div>
+  <div class="expert" id="road-expert">
+    <strong>What students are doing:</strong> reading <em>curvature</em> off a picture.
+    Valley bottoms (B, E) curve upward — the road must push extra hard, so the driver feels heavier.
+    Hilltops (C) curve away — lighter. Straight stretches (A, D), even slanted ones, add nothing.
+    No numbers are computed, but the answer is graded instantly.
+  </div>
+</section>
+
+<!-- ===================== 2. FALCON GRAPHS (column connect) ===================== -->
+<section class="card" id="falcon">
+  <span class="kicker">Interpret graphs</span><span class="coursechip">Physics 1: Mechanics · Forms of Energy</span>
+  <h2>A peregrine falcon dives</h2>
+  <p class="prompt">A falcon dives from rest, approaching terminal velocity. Match each plot to the
+    quantity it shows as a function of time. <em>Tap a plot, then tap a quantity.</em> Tap a wire to remove it.</p>
+  <figure><img src="../asy/falcon.svg" alt="Three unlabeled plots (A), (B), (C) versus time" style="width:min(700px,100%)"></figure>
+  <div class="connect" id="falcon-connect">
+    <svg class="wires" id="falcon-wires"></svg>
+    <div id="falcon-left"></div>
+    <div id="falcon-right"></div>
+  </div>
+  <div class="controls">
+    <button onclick="checkConnect('falcon')">Check my answer</button>
+    <button class="secondary" onclick="resetConnect('falcon')">Reset</button>
+    <span class="verdict" id="falcon-verdict"></span>
+  </div>
+  <div class="expert" id="falcon-expert">
+    <strong>What students are doing:</strong> translating a physical story into qualitative features of curves.
+    Speed grows and saturates (B). The magnitude of acceleration starts at <em>g</em> and dies away (A).
+    Height falls ever faster, then at a steady rate (C). Nothing to plug in — and only one matching survives.
+  </div>
+</section>
+
+<!-- ===================== 3. GALILEO PENDULUM (click on image) ===================== -->
+<section class="card" id="pend">
+  <span class="kicker">Commit to a prediction</span><span class="coursechip">Introduction to Physics · Conservation Laws</span>
+  <h2>Where does the pendulum stop?</h2>
+  <p class="prompt">Galileo releases a pendulum from point <strong>C</strong>. Swinging through the bottom
+    <strong>B</strong>, the string catches on a peg at <strong>E</strong>, and the lower part swings on around it.
+    <strong>Click the point in the image</strong> where the bob stops and turns around.
+    (The point you're clicking is not necessarily labeled. Assume an ideal pendulum.)</p>
+  <figure>
+    <span class="clickwrap" id="pend-wrap">
+      <img src="../assets/img/pendulum_click.png" id="pend-img" alt="Pendulum with pivot A, peg E, release point C, points B and D">
+      <span class="marker" id="pend-marker"></span>
+    </span>
+  </figure>
+  <div class="controls">
+    <button onclick="checkPend()">Check my answer</button>
+    <button class="secondary" onclick="resetPend()">Reset</button>
+    <span class="verdict" id="pend-verdict"></span>
+  </div>
+  <div class="expert" id="pend-expert">
+    <strong>What students are doing:</strong> using energy conservation to make a <em>spatial</em> commitment.
+    The bob must return to its release height — but on the tighter circle around the peg <strong>E</strong>.
+    Clicking <strong>D</strong> (same height, original arc) is the classic near-miss: right conservation law,
+    wrong constraint. A grader that accepts a click can tell those two ideas apart.
+  </div>
+</section>
+
+<!-- ===================== 4. CAMERA OBSCURA (multi-select) ===================== -->
+<section class="card" id="obscura">
+  <span class="kicker">Reason with symmetry</span><span class="coursechip">Middle School Physics · Sight and Images</span>
+  <h2>Letters in a camera obscura</h2>
+  <p class="prompt">A camera obscura (pinhole in a dark room) projects an image of Times Square onto the wall —
+    upside down <em>and</em> left–right reversed. Which of these letters would look <strong>identical to normal</strong>
+    in the projected image? Select all that apply. (Assume the most symmetric font for each letter.)</p>
+  <div class="chips" id="obscura-tray" style="background:transparent; padding:0;">
+    <span class="chip" data-i="0" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px;">A</span>
+    <span class="chip" data-i="1" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px;">E</span>
+    <span class="chip" data-i="2" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px;">F</span>
+    <span class="chip" data-i="3" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px;">H</span>
+    <span class="chip" data-i="4" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px;">Z</span>
+  </div>
+  <div class="controls">
+    <button onclick="checkObscura()">Check my answer</button>
+    <button class="secondary" onclick="resetObscura()">Reset</button>
+    <span class="verdict" id="obscura-verdict"></span>
+  </div>
+  <div class="expert" id="obscura-expert">
+    <strong>What students are doing:</strong> discovering that "flipped up–down <em>and</em> left–right" is the same as
+    rotating 180° — so a letter survives exactly when it has two-fold rotational symmetry. H and Z do; A, E, and F don't.
+    Mentally rotating letters is the whole task; the finite answer set is what makes it gradable.
+  </div>
+</section>
+
+<footer>
+  These demos re-implement AoPS "motor" interactive problem types (drag-into-categories, column-connect,
+  click-on-image, multi-select) for illustration. The originals run inside
+  <a href="https://artofproblemsolving.com/online">AoPS Online</a> courses with full solutions and feedback.
+</footer>
+</main>
+
+<script>
+/* ---------- generic bins widget ---------- */
+const BIN_PROBLEMS = {
+  road: {
+    chips: ["A", "B", "C", "D", "E"],
+    bins: ["heavier", "the same", "lighter"],
+    // answer: bin index for each chip index  (heavier: B,E — same: A,D — lighter: C)
+    key: { 0: 1, 1: 0, 2: 2, 3: 1, 4: 0 }
+  }
+};
+let selectedChip = null;
+
+function buildBins(id) {
+  const p = BIN_PROBLEMS[id];
+  const tray = document.getElementById(id + "-tray");
+  const binsEl = document.getElementById(id + "-bins");
+  tray.innerHTML = ""; binsEl.innerHTML = "";
+  p.chips.forEach((c, i) => {
+    const el = document.createElement("span");
+    el.className = "chip"; el.textContent = c; el.dataset.i = i;
+    el.onclick = (e) => { e.stopPropagation(); selectChip(el); };
+    tray.appendChild(el);
+  });
+  p.bins.forEach((b, j) => {
+    const bin = document.createElement("div");
+    bin.className = "bin"; bin.dataset.j = j;
+    bin.innerHTML = "<h3>" + b + "</h3><div class='content'></div>";
+    bin.onclick = () => dropChip(bin);
+    binsEl.appendChild(bin);
+  });
+}
+function selectChip(el) {
+  document.querySelectorAll(".chip.selected").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedChip = el;
+}
+function dropChip(bin) {
+  if (!selectedChip) return;
+  bin.querySelector(".content").appendChild(selectedChip);
+  selectedChip.classList.remove("selected");
+  selectedChip = null;
+}
+function checkBins(id) {
+  const p = BIN_PROBLEMS[id];
+  let all = true, placed = 0;
+  document.querySelectorAll("#" + id + "-bins .bin").forEach(bin => {
+    const j = +bin.dataset.j;
+    bin.querySelectorAll(".chip").forEach(ch => {
+      placed++;
+      const ok = p.key[+ch.dataset.i] === j;
+      ch.classList.toggle("right", ok);
+      ch.classList.toggle("wrong", !ok);
+      if (!ok) all = false;
+    });
+  });
+  const v = document.getElementById(id + "-verdict");
+  if (placed < p.chips.length) { v.textContent = "Place all " + p.chips.length + " labels first."; v.className = "verdict bad"; return; }
+  v.textContent = all ? "Correct!" : "Not quite — red ones are misplaced.";
+  v.className = "verdict " + (all ? "good" : "bad");
+  document.getElementById(id + "-expert").classList.add("show");
+}
+function resetBins(id) {
+  buildBins(id);
+  document.getElementById(id + "-verdict").textContent = "";
+  document.getElementById(id + "-expert").classList.remove("show");
+}
+
+/* ---------- column connect ---------- */
+const CONNECT_PROBLEMS = {
+  falcon: {
+    left: ["(A)", "(B)", "(C)"],
+    right: ["height", "speed", "acceleration (magnitude)"],
+    key: { 0: 2, 1: 1, 2: 0 }   // A->acceleration, B->speed, C->height
+  }
+};
+const connState = {};
+function buildConnect(id) {
+  const p = CONNECT_PROBLEMS[id];
+  connState[id] = { pairs: {}, sel: null };
+  const L = document.getElementById(id + "-left"), R = document.getElementById(id + "-right");
+  L.innerHTML = ""; R.innerHTML = "";
+  p.left.forEach((t, i) => {
+    const el = document.createElement("div");
+    el.className = "colitem"; el.textContent = t; el.dataset.side = "L"; el.dataset.i = i;
+    el.onclick = () => pickConn(id, el);
+    L.appendChild(el);
+  });
+  p.right.forEach((t, i) => {
+    const el = document.createElement("div");
+    el.className = "colitem"; el.textContent = t; el.dataset.side = "R"; el.dataset.i = i;
+    el.onclick = () => pickConn(id, el);
+    R.appendChild(el);
+  });
+  drawWires(id);
+}
+function pickConn(id, el) {
+  const st = connState[id];
+  if (st.sel && st.sel.dataset.side !== el.dataset.side) {
+    const l = st.sel.dataset.side === "L" ? +st.sel.dataset.i : +el.dataset.i;
+    const r = st.sel.dataset.side === "R" ? +st.sel.dataset.i : +el.dataset.i;
+    st.pairs[l] = (st.pairs[l] === r) ? undefined : r;   // toggle
+    if (st.pairs[l] === undefined) delete st.pairs[l];
+    st.sel.classList.remove("selected"); st.sel = null;
+    drawWires(id);
+  } else {
+    if (st.sel) st.sel.classList.remove("selected");
+    st.sel = (st.sel === el) ? null : el;
+    if (st.sel) st.sel.classList.add("selected");
+  }
+}
+function drawWires(id, grading) {
+  const st = connState[id];
+  const svg = document.getElementById(id + "-wires");
+  const box = document.getElementById(id + "-connect").getBoundingClientRect();
+  svg.setAttribute("viewBox", "0 0 " + box.width + " " + box.height);
+  svg.innerHTML = "";
+  Object.entries(st.pairs).forEach(([l, r]) => {
+    const le = document.querySelector("#" + id + "-left .colitem[data-i='" + l + "']").getBoundingClientRect();
+    const re = document.querySelector("#" + id + "-right .colitem[data-i='" + r + "']").getBoundingClientRect();
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", le.right - box.left); line.setAttribute("y1", le.top + le.height / 2 - box.top);
+    line.setAttribute("x2", re.left - box.left);  line.setAttribute("y2", re.top + re.height / 2 - box.top);
+    let color = "#1b365d";
+    if (grading) color = (CONNECT_PROBLEMS[id].key[l] === +r) ? "#61ad00" : "#c0392b";
+    line.setAttribute("stroke", color); line.setAttribute("stroke-width", "3.5");
+    line.setAttribute("pointer-events", "stroke"); line.style.cursor = "pointer";
+    line.addEventListener("click", () => { delete st.pairs[l]; drawWires(id); });
+    svg.appendChild(line);
+  });
+}
+function checkConnect(id) {
+  const p = CONNECT_PROBLEMS[id], st = connState[id];
+  const v = document.getElementById(id + "-verdict");
+  if (Object.keys(st.pairs).length < p.left.length) {
+    v.textContent = "Connect all " + p.left.length + " plots first."; v.className = "verdict bad"; return;
+  }
+  drawWires(id, true);
+  const all = Object.entries(st.pairs).every(([l, r]) => p.key[l] === +r);
+  v.textContent = all ? "Correct!" : "Not quite — red wires are wrong.";
+  v.className = "verdict " + (all ? "good" : "bad");
+  document.getElementById(id + "-expert").classList.add("show");
+}
+function resetConnect(id) {
+  buildConnect(id);
+  document.getElementById(id + "-verdict").textContent = "";
+  document.getElementById(id + "-expert").classList.remove("show");
+}
+
+/* ---------- click on image ---------- */
+/* Correct point: on the circle about peg E, at the release height of C.
+   Fractions of natural image size (574 x 453): target (0.239, 0.711), r 0.09.
+   D (0.09, 0.711) is the classic distractor: same height, original arc. */
+let pendClick = null;
+document.getElementById("pend-wrap").addEventListener("click", (e) => {
+  const img = document.getElementById("pend-img");
+  const r = img.getBoundingClientRect();
+  const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+  pendClick = { fx, fy };
+  const m = document.getElementById("pend-marker");
+  m.style.left = (fx * 100) + "%"; m.style.top = (fy * 100) + "%"; m.style.display = "block";
+});
+function checkPend() {
+  const v = document.getElementById("pend-verdict");
+  if (!pendClick) { v.textContent = "Click on the image first."; v.className = "verdict bad"; return; }
+  const T = { x: 0.239, y: 0.711 }, D = { x: 0.09, y: 0.711 };
+  const d = Math.hypot(pendClick.fx - T.x, pendClick.fy - T.y);
+  const dD = Math.hypot(pendClick.fx - D.x, pendClick.fy - D.y);
+  if (d < 0.09) { v.textContent = "Correct!"; v.className = "verdict good"; }
+  else if (dD < 0.07) {
+    v.textContent = "So close — that's where it would stop with NO peg. The string now pivots around E.";
+    v.className = "verdict bad";
+  } else if (Math.abs(pendClick.fy - T.y) < 0.06) {
+    v.textContent = "Right height! But the bob swings on the circle around the peg E.";
+    v.className = "verdict bad";
+  } else {
+    v.textContent = "Not quite. Think about what energy conservation says about the stopping height.";
+    v.className = "verdict bad";
+  }
+  document.getElementById("pend-expert").classList.add("show");
+}
+function resetPend() {
+  pendClick = null;
+  document.getElementById("pend-marker").style.display = "none";
+  document.getElementById("pend-verdict").textContent = "";
+  document.getElementById("pend-expert").classList.remove("show");
+}
+
+/* ---------- multi select ---------- */
+function toggleMulti(el) { el.classList.toggle("selected"); }
+function checkObscura() {
+  const key = new Set([3, 4]); // H, Z
+  let all = true;
+  document.querySelectorAll("#obscura-tray .chip").forEach(ch => {
+    const i = +ch.dataset.i, sel = ch.classList.contains("selected");
+    const shouldBe = key.has(i);
+    ch.classList.toggle("right", sel && shouldBe);
+    ch.classList.toggle("wrong", sel !== shouldBe && (sel || shouldBe));
+    if (sel !== shouldBe) all = false;
+  });
+  const v = document.getElementById("obscura-verdict");
+  v.textContent = all ? "Correct!" : "Not quite — think about which letters survive a 180° rotation.";
+  v.className = "verdict " + (all ? "good" : "bad");
+  document.getElementById("obscura-expert").classList.add("show");
+}
+function resetObscura() {
+  document.querySelectorAll("#obscura-tray .chip").forEach(ch => ch.classList.remove("selected", "right", "wrong"));
+  document.getElementById("obscura-verdict").textContent = "";
+  document.getElementById("obscura-expert").classList.remove("show");
+}
+
+buildBins("road");
+buildConnect("falcon");
+window.addEventListener("resize", () => drawWires("falcon"));
+</script>
+</body>
+</html>
