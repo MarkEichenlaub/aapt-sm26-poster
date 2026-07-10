@@ -76,9 +76,18 @@
   .fmt-table { margin-top: 0.1in; }
   .fmt-table .row { display: flex; align-items: baseline; padding: 0.115in 0; border-bottom: 2px solid #dbe2ea; }
   .fmt-table .row:last-child { border-bottom: 0; }
-  .fmt-table .a { flex: 0 0 46%; font-weight: 700; font-size: 23.5pt; color: var(--navy); }
-  .fmt-table .b { flex: 1; font-size: 23.5pt; }
+  .fmt-table .row.head { border-bottom: 3.5px solid var(--navy); padding-bottom: 0.07in; }
+  .fmt-table .row.head .a, .fmt-table .row.head .b {
+    font-size: 20.5pt; font-weight: 800; color: var(--navy);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .fmt-table .a { flex: 0 0 54%; font-size: 23.5pt; padding-right: 0.15in; }
+  .fmt-table .b { flex: 1; font-weight: 700; font-size: 23.5pt; color: var(--navy); }
   .fmt-caption { margin-top: 0.14in; font-size: 20pt; color: var(--muted); }
+  /* bulleted claim list */
+  .claimlist { margin: 0.12in 0 0 0.42in; }
+  .claimlist li { font-size: 24.5pt; line-height: 1.42; }
+  .claimlist li::marker { color: var(--green); }
 
   .caveat {
     margin-top: 0.2in; background: #fff; border-left: 0.12in solid var(--lightgreen);
@@ -154,8 +163,8 @@
 
   /* ============ SURVEY STRIP ============ */
   .strip {
-    flex: 0 0 4.55in; background: var(--panel); border-radius: 0.22in; border-top: 0.1in solid var(--navy);
-    padding: 0.26in 0.36in; display: flex; flex-direction: column; min-height: 0;
+    flex: 0 0 4.3in; background: var(--panel); border-radius: 0.22in; border-top: 0.1in solid var(--navy);
+    padding: 0.24in 0.36in; display: flex; flex-direction: column; min-height: 0;
   }
   .strip h2 { font-size: 33pt; font-weight: 800; color: var(--navy); margin-bottom: 0.16in; }
   .minis { flex: 1 1 auto; display: flex; gap: 0.32in; min-height: 0; }
@@ -199,11 +208,15 @@
 
   /* ============ FOOTER ============ */
   footer {
-    flex: 0 0 0.78in; background: var(--panel); border-top: 3px solid #d5dde6;
-    display: flex; align-items: center; justify-content: center; gap: 0.5in;
-    font-size: 17.5pt; color: var(--muted); padding: 0 0.6in; text-align: center;
+    flex: 0 0 1.55in; background: var(--panel); border-top: 3px solid #d5dde6;
+    display: flex; flex-direction: column; justify-content: center; gap: 0.1in;
+    padding: 0.14in 0.6in; text-align: center;
   }
-  footer b { color: var(--navy); }
+  footer .courses { font-size: 20pt; color: var(--ink); }
+  footer .courses b { color: var(--navy); }
+  footer .breadth { font-size: 19pt; color: var(--ink); }
+  footer .breadth b { color: var(--navy); }
+  footer .credits { font-size: 15.5pt; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -232,7 +245,7 @@
         <div>Find the tension in the rope.</div>
         <div>Find the time to reach the ground.</div>
         <div>Find the final speed.</div>
-        <div>Find the distance traveled.</div>
+        <div>Find the kinetic energy.</div>
         <div>Find the …</div>
       </div>
     </div>
@@ -242,19 +255,26 @@
       <p class="big">An auto-grader can check any answer with a well-defined key —
          not just numbers.</p>
       <p>Change <i>what you ask for</i>, and the same instant-feedback machinery invites the
-         patterns of thought we prize in rich human-feedback settings: designing experiments,
-         choosing models, weighing evidence, critiquing calculations, diagnosing errors.</p>
+         patterns of thought we prize in rich human-feedback settings:</p>
+      <ul class="claimlist">
+        <li>designing experiments</li>
+        <li>choosing models</li>
+        <li>weighing evidence</li>
+        <li>critiquing calculations</li>
+        <li>diagnosing errors</li>
+      </ul>
     </div>
 
     <div class="panel">
-      <h2>If the answer is ___, the thinking is ___</h2>
+      <h2>If the thinking is ___, the answer can be ___</h2>
       <div class="fmt-table">
-        <div class="row"><div class="a">a number ± tolerance</div><div class="b">execute a plan</div></div>
-        <div class="row"><div class="a">items sorted into bins</div><div class="b">apply a criterion consistently</div></div>
-        <div class="row"><div class="a">two columns connected</div><div class="b">map structure onto structure</div></div>
-        <div class="row"><div class="a">all-that-apply choices</div><div class="b">judge each claim on its own</div></div>
-        <div class="row"><div class="a">a click on the image</div><div class="b">commit to a spatial prediction</div></div>
-        <div class="row"><div class="a">a ranking</div><div class="b">compare cases without computing</div></div>
+        <div class="row head"><div class="a">thinking</div><div class="b">answer</div></div>
+        <div class="row"><div class="a">execute a plan</div><div class="b">a number ± tolerance</div></div>
+        <div class="row"><div class="a">apply a criterion consistently</div><div class="b">items sorted into bins</div></div>
+        <div class="row"><div class="a">map structure onto structure</div><div class="b">two columns connected</div></div>
+        <div class="row"><div class="a">judge each claim on its own</div><div class="b">all-that-apply choices</div></div>
+        <div class="row"><div class="a">commit to a spatial prediction</div><div class="b">a click on the image</div></div>
+        <div class="row"><div class="a">compare cases without computing</div><div class="b">a ranking</div></div>
       </div>
       <div class="fmt-caption">Every format above runs auto-graded in AoPS Online courses today.
         The six problems at right are real homework, shown as students answer them.</div>
@@ -329,6 +349,7 @@
           tries to settle the question with everyday observations, taking each at face value —
           <i>never accounting for air drag</i>. Sort each observation by which hypothesis
           Dr. Vacuum will conclude it supports.</p>
+        <figure style="flex:0 0 auto; margin-top:0.14in"><img src="asy/hypotheses.svg" alt="Galileo: equal acceleration arrows; Impetus: arrows scale with density" style="width:58%; max-height:1.9in"></figure>
         <div class="binmock">
           <div class="bin"><h4>Galileo</h4>
             <span class="chip">Kepler's laws (density never enters)</span><span class="chip">hammer &amp; feather fall together on the Moon</span><span class="chip">a balloon would fall on the Moon</span></div>
@@ -352,6 +373,7 @@
           Earth's equator; a second string is $6$ m longer and circles the equator at a uniform
           height. How high above the ground is it? Match each student's statement to their most
           productive next step.</p>
+        <figure style="flex:0 0 auto; margin-top:0.12in"><img src="asy/string_earth.svg" alt="Earth with a snug string and a longer string hovering at height h" style="width:36%; max-height:2.9in"></figure>
         <div class="bubbles">
           <div class="bubblerow">
             <div class="bubble">"I don't understand this problem at all. I don't know where to start."</div>
@@ -397,7 +419,7 @@
 
     <!-- ============ SURVEY STRIP ============ -->
     <div class="strip">
-      <h2>…and more, from a 28-problem survey across four AoPS physics courses</h2>
+      <h2>…and more, from a 28-problem survey across the AoPS physics courses</h2>
       <div class="minis">
         <div class="mini">
           <div class="thumb">
@@ -405,7 +427,7 @@
             <img class="multi" src="assets/img/lamp_horizontal.jpg" alt="horizontal tube lamp" style="max-width:44%">
           </div>
           <p><b>Reason backward from evidence.</b> A tube lamp is either vertical or horizontal.
-             From each object's shadow photo alone, click which. (Middle School Physics)</p>
+             From each object's shadow photo alone, click which. (Middle School Physics 1)</p>
         </div>
         <div class="mini">
           <div class="thumb"><img src="asy/balloons.svg" alt="balloons in accelerating car" style="max-height:1.8in"></div>
@@ -431,9 +453,9 @@
              Implicit literacy, made explicit. (Intro to Physics)</p>
         </div>
         <div class="mini">
-          <div class="thumb"><div class="txtart">$T = 2\pi\sqrt{\ell/g}$<br>plot $T^2$ vs. $\ell$<br>⇒ slope $= 4\pi^2\!/g$</div></div>
-          <p><b>Linearize real data.</b> Choose axes that straighten pendulum data, then read
-             $g$ off the slope — the working scientist's workflow. (Intro to Physics)</p>
+          <div class="thumb"><img src="assets/img/fountain_fit.jpg" alt="fountain arc with fitted parabola" style="max-height:1.9in"></div>
+          <p><b>Measure the world from a photo.</b> Fit a parabola to a fountain's stream by
+             entering coefficients; the grader accepts a narrow band. (Mechanics · Projectile Motion)</p>
         </div>
       </div>
     </div>
@@ -501,9 +523,18 @@
 </main>
 
 <footer>
-  <div>Problems © Art of Problem Solving — <b>Introduction to Physics</b> · <b>Physics 1: Mechanics</b> ·
-    <b>Middle School Physics</b> &nbsp;·&nbsp; Moon photographs: NASA &nbsp;·&nbsp;
-    Diagrams: course Asymptote sources &nbsp;·&nbsp; Contact: mark.d.eichenlaub@gmail.com</div>
+  <div class="courses"><b>The AoPS physics courses:</b>
+    Middle School Physics 1 <span style="color:var(--muted)">(light &amp; waves)</span> ·
+    Introduction to Physics <span style="color:var(--muted)">(physics skills for high school)</span> ·
+    Physics 1: Mechanics <span style="color:var(--muted)">(AP Physics 1)</span> ·
+    F=ma Problem Series &amp; PhysicsWOOT <span style="color:var(--muted)">(olympiad contest prep)</span> ·
+    Relativity</div>
+  <div class="breadth">All are <b>online, extracurricular courses that students enroll in directly</b>.
+    Art of Problem Solving is broader still: math, science, and language arts online —
+    plus in-person AoPS Academies and summer camps. <b>artofproblemsolving.com</b></div>
+  <div class="credits">Problems © Art of Problem Solving · Moon photographs: NASA ·
+    Fountain photograph: @elensham, Explorest · Diagrams: course Asymptote sources ·
+    Contact: mark.d.eichenlaub@gmail.com</div>
 </footer>
 
 </body>

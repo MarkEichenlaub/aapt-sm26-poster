@@ -100,7 +100,7 @@
 <header>
   <div class="wrap">
     <h1>Try the Problems</h1>
-    <p>Live, auto-graded re-implementations of four homework problems from the poster
+    <p>Live, auto-graded re-implementations of five problems from the poster
       <em>Auto-Graded Homework that Invites Students to Think Broadly</em> —
       Mark Eichenlaub, Art of Problem Solving · AAPT Summer Meeting 2026, Pasadena.
       <a href="../">Back to the poster page</a></p>
@@ -182,9 +182,44 @@
   </div>
 </section>
 
-<!-- ===================== 4. CAMERA OBSCURA (multi-select) ===================== -->
+<!-- ===================== 4. FOUNTAIN PARABOLA FIT ===================== -->
+<section class="card" id="fountain">
+  <span class="kicker">Measure the world from a photo</span><span class="coursechip">Physics 1: Mechanics · Projectile Motion</span>
+  <h2>Fit the fountain</h2>
+  <p class="prompt">This fountain shoots water across the Chicago River. Axes are overlaid in units of
+    10&thinsp;m. Adjust the coefficients until <em>your</em> parabola (dashed yellow) fits the stream:
+    <em>y</em>/10&thinsp;m = <em>a</em>·(<em>x</em>/10&thinsp;m)² + <em>b</em>.
+    The grader accepts any fit within a narrow band. (The thin red curve is one class's best fit.)</p>
+  <figure>
+    <span class="clickwrap" id="fountain-wrap" style="cursor:default; max-width:560px; display:inline-block; position:relative;">
+      <img src="../assets/img/fountain_fit_crop.jpg" id="fountain-img" alt="Fountain arc over a river with axes overlay" style="display:block; width:100%;">
+      <svg id="fountain-svg" viewBox="0 0 1062 1055" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
+    </span>
+  </figure>
+  <div class="checkrow">
+    <label style="flex:0 0 auto; font-weight:700; color:var(--navy);">a = <span id="fountain-aval">-0.10</span></label>
+    <input type="range" id="fountain-a" min="-0.60" max="0" step="0.01" value="-0.10" style="flex:1" oninput="drawFountain()">
+  </div>
+  <div class="checkrow">
+    <label style="flex:0 0 auto; font-weight:700; color:var(--navy);">b = <span id="fountain-bval">0.40</span></label>
+    <input type="range" id="fountain-b" min="0" max="0.60" step="0.01" value="0.40" style="flex:1" oninput="drawFountain()">
+  </div>
+  <div class="controls">
+    <button onclick="checkFountain()">Check my answer</button>
+    <button class="secondary" onclick="resetFountain()">Reset</button>
+    <span class="verdict" id="fountain-verdict"></span>
+  </div>
+  <div class="expert" id="fountain-expert">
+    <strong>What students are doing:</strong> measuring the world from a photograph — mapping a real
+    stream onto a quadratic model. A careful fitter notices the left side of the arc droops below any
+    parabola: air drag steals horizontal speed. The graded answer is just two numbers with tolerance,
+    but the activity is model-fitting against reality.
+  </div>
+</section>
+
+<!-- ===================== 5. CAMERA OBSCURA (multi-select) ===================== -->
 <section class="card" id="obscura">
-  <span class="kicker">Reason with symmetry</span><span class="coursechip">Middle School Physics · Sight and Images</span>
+  <span class="kicker">Reason with symmetry</span><span class="coursechip">Middle School Physics 1 · Sight and Images</span>
   <h2>Letters in a camera obscura</h2>
   <p class="prompt">A camera obscura (pinhole in a dark room) projects an image of Times Square onto the wall —
     upside down <em>and</em> left–right reversed. Which of these letters would look <strong>identical to normal</strong>
@@ -210,7 +245,7 @@
 
 <footer>
   These demos re-implement AoPS "motor" interactive problem types (drag-into-categories, column-connect,
-  click-on-image, multi-select) for illustration. The originals run inside
+  click-on-image, curve-fitting, multi-select) for illustration. The originals run inside
   <a href="https://artofproblemsolving.com/online">AoPS Online</a> courses with full solutions and feedback.
 </footer>
 </main>
@@ -403,6 +438,48 @@ function resetPend() {
   document.getElementById("pend-verdict").textContent = "";
   document.getElementById("pend-expert").classList.remove("show");
 }
+
+/* ---------- fountain parabola fit ---------- */
+/* mapping recovered from the course's best-fit curve: origin (527.5, 531.0) px,
+   347.8 px per 10 m unit, in the 1062x1055 cropped image */
+const FTN = { ox: 527.5, oy: 531.0, U: 347.8, W: 1062, H: 1055 };
+function drawFountain() {
+  const a = parseFloat(document.getElementById("fountain-a").value);
+  const b = parseFloat(document.getElementById("fountain-b").value);
+  document.getElementById("fountain-aval").textContent = a.toFixed(2);
+  document.getElementById("fountain-bval").textContent = b.toFixed(2);
+  const pts = [];
+  for (let px = 0; px <= FTN.W; px += 6) {
+    const x10 = (px - FTN.ox) / FTN.U;
+    const py = FTN.oy - FTN.U * (a * x10 * x10 + b);
+    if (py >= -40 && py <= FTN.H + 40) pts.push(px.toFixed(0) + "," + py.toFixed(1));
+  }
+  document.getElementById("fountain-svg").innerHTML =
+    "<polyline points='" + pts.join(" ") + "' fill='none' stroke='#ffd23e' stroke-width='7' stroke-dasharray='18 12'/>";
+}
+function checkFountain() {
+  const a = parseFloat(document.getElementById("fountain-a").value);
+  const b = parseFloat(document.getElementById("fountain-b").value);
+  const v = document.getElementById("fountain-verdict");
+  const aOK = a >= -0.38 && a <= -0.33, bOK = b >= 0.22 && b <= 0.28;
+  if (aOK && bOK) { v.textContent = "Correct! That fit lands in the accepted band."; v.className = "verdict good"; }
+  else {
+    let hint = [];
+    if (!bOK) hint.push(b > 0.28 ? "your peak is too high" : "your peak is too low");
+    if (!aOK) hint.push(a < -0.38 ? "your arc is too narrow" : "your arc is too wide");
+    v.textContent = "Not yet — " + hint.join("; ") + ".";
+    v.className = "verdict bad";
+  }
+  document.getElementById("fountain-expert").classList.add("show");
+}
+function resetFountain() {
+  document.getElementById("fountain-a").value = -0.10;
+  document.getElementById("fountain-b").value = 0.40;
+  document.getElementById("fountain-verdict").textContent = "";
+  document.getElementById("fountain-expert").classList.remove("show");
+  drawFountain();
+}
+drawFountain();
 
 /* ---------- multi select ---------- */
 function toggleMulti(el) { el.classList.toggle("selected"); }
