@@ -99,19 +99,23 @@
   .course { font-size: 18.5pt; color: var(--muted); margin-top: 0.1in; }
   .card h3 { font-size: 33pt; font-weight: 800; color: var(--navy); margin-top: 0.06in; line-height: 1.12; }
   .prob {
-    font-family: "Source Serif 4", serif; font-size: 22.5pt; line-height: 1.34; margin-top: 0.14in;
+    font-family: "Source Serif 4", serif; font-size: 23pt; line-height: 1.34; margin-top: 0.14in;
+  }
+  /* workbook-style column connect (falcon card) */
+  .connectrow { margin-top: 0.1in; flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; gap: 0.55in; }
+  .connectrow img.plots { width: 44%; max-height: 100%; object-fit: contain; }
+  .wordcol { flex: 0 1 44%; display: flex; flex-direction: column; justify-content: space-around; align-self: stretch; padding: 0.35in 0; }
+  .wordcol div {
+    border: 3px solid var(--navy); color: var(--navy); border-radius: 0.14in; background: #fff;
+    font-weight: 700; font-size: 22pt; text-align: center; padding: 0.12in 0.1in;
   }
   .prob .choicepair { display: block; margin-top: 0.06in; padding-left: 0.25in; }
   .card figure { margin: 0.18in 0 0; text-align: center; flex: 1 1 auto; min-height: 0;
                  display: flex; align-items: center; justify-content: center; }
   .card figure img { max-width: 100%; max-height: 100%; }
-  .fmt-chip {
-    align-self: flex-start; margin-top: 0.16in; border: 3px solid var(--navy); color: var(--navy);
-    font-weight: 700; font-size: 19.5pt; padding: 0.05in 0.2in; border-radius: 99px; background: #fff;
-  }
   .note {
     margin-top: 0.16in; background: #f4f9e7; border-left: 0.1in solid var(--green);
-    border-radius: 0 0.12in 0.12in 0; padding: 0.15in 0.2in; font-size: 20.5pt; line-height: 1.3;
+    border-radius: 0 0.12in 0.12in 0; padding: 0.15in 0.2in; font-size: 21pt; line-height: 1.3;
   }
   .note b { color: var(--navy); }
 
@@ -121,7 +125,7 @@
   .binmock .bin h4 { font-size: 20pt; color: var(--navy); text-align: center; margin-bottom: 0.07in; }
   .binmock .chip {
     display: inline-block; border: 2.5px solid var(--navy); color: var(--navy); background: #fff;
-    font-size: 17.5pt; font-weight: 600; border-radius: 99px; padding: 0.03in 0.13in; margin: 0.025in;
+    font-size: 18.5pt; font-weight: 600; border-radius: 99px; padding: 0.03in 0.13in; margin: 0.025in;
   }
 
   /* stuck-students speech bubbles */
@@ -129,17 +133,17 @@
   .bubblerow { display: flex; align-items: center; gap: 0.12in; }
   .bubble {
     flex: 1 1 55%; background: #eef1f6; border-radius: 0.16in; padding: 0.12in 0.18in;
-    font-family: "Source Serif 4", serif; font-style: italic; font-size: 19.5pt; line-height: 1.25; position: relative;
+    font-family: "Source Serif 4", serif; font-style: italic; font-size: 20pt; line-height: 1.25; position: relative;
   }
   .arrow { flex: 0 0 auto; color: var(--green); font-size: 30pt; font-weight: 800; }
   .step {
     flex: 1 1 45%; border: 3px solid var(--green); border-radius: 0.14in; padding: 0.1in 0.15in;
-    font-size: 18.5pt; font-weight: 700; color: var(--navy); background: #f7fbee; text-align: center;
+    font-size: 19.5pt; font-weight: 700; color: var(--navy); background: #f7fbee; text-align: center;
   }
 
   /* cradle multi-select mock */
   .opts { margin-top: 0.16in; display: flex; flex-direction: column; gap: 0.1in; }
-  .opt { display: flex; gap: 0.14in; align-items: flex-start; font-size: 19.5pt; line-height: 1.25; }
+  .opt { display: flex; gap: 0.14in; align-items: flex-start; font-size: 20pt; line-height: 1.25; }
   .opt .box {
     flex: 0 0 auto; width: 0.32in; height: 0.32in; border: 3.5px solid var(--navy); border-radius: 0.06in;
     margin-top: 0.03in; display: flex; align-items: center; justify-content: center;
@@ -162,7 +166,7 @@
   .mini .thumb .txtart {
     font-family: "Source Serif 4", serif; font-size: 30pt; color: var(--navy); text-align: center; line-height: 1.3;
   }
-  .mini p { font-size: 18.5pt; line-height: 1.28; margin-top: 0.12in; }
+  .mini p { font-size: 20pt; line-height: 1.28; margin-top: 0.12in; }
   .mini p b { color: var(--navy); }
 
   /* ============ RIGHT RAIL SPECIFICS ============ */
@@ -253,7 +257,7 @@
         <div class="row"><div class="a">a ranking</div><div class="b">compare cases without computing</div></div>
       </div>
       <div class="fmt-caption">Every format above runs auto-graded in AoPS Online courses today.
-        The six problems at right are real homework, shown with their grading formats.</div>
+        The six problems at right are real homework, shown as students answer them.</div>
     </div>
   </div>
 
@@ -262,21 +266,21 @@
     <div class="cardrow">
 
       <div class="card">
-        <span class="kicker">Design an experiment</span>
+        <span class="kicker">Improve an experiment</span>
         <div class="course">Physics 1: Mechanics · Acceleration</div>
-        <h3>Make the Atwood machine measure&nbsp;g</h3>
-        <p class="prob">You've modeled an Atwood machine's acceleration in terms of
-          $r = m_L/m_H$. Now design an accurate experiment to measure $g$ with it, using a stopwatch.
-          For each pair of design choices, which gives a <i>more accurate</i> experiment?
-          <span class="choicepair">• start the heavy box at the top — or halfway down?</span>
-          <span class="choicepair">• a single value of $r$ — or many?</span>
-          <span class="choicepair">• one trial per $r$ — or several?</span>
-        </p>
-        <figure><img src="asy/atwood.svg" alt="Two Atwood machine setups" style="width:78%; max-height:5in"></figure>
-        <span class="fmt-chip">answer = drag each choice into a bin</span>
-        <div class="note"><b>What students are doing:</b> weighing longer timing windows,
-          model-stressing ranges, and repeated trials — experimental-design judgment,
-          graded with no paragraphs.</div>
+        <h3>Measuring g with an Atwood machine</h3>
+        <p class="prob">You're measuring $g$ by releasing an Atwood machine and timing
+          how long the heavier box takes to reach the floor.
+          Which of these changes will reduce the experiment's uncertainty?</p>
+        <div class="opts">
+          <div class="opt"><span class="box"></span><span>release the heavier box from halfway down instead of from the top</span></div>
+          <div class="opt sel"><span class="box">✓</span><span>use several different ratios of the two masses instead of a single ratio</span></div>
+          <div class="opt sel"><span class="box">✓</span><span>time multiple trials at each mass ratio instead of one</span></div>
+        </div>
+        <figure><img src="asy/atwood.svg" alt="Two Atwood machine setups" style="width:70%; max-height:4.4in"></figure>
+        <div class="note"><b>What students are doing:</b> weighing timing windows (a longer
+          fall is easier to time), model-stressing ranges, and repeated trials —
+          experimental judgment, with no lab report to grade.</div>
       </div>
 
       <div class="card">
@@ -284,10 +288,15 @@
         <div class="course">Physics 1: Mechanics · Forms of Energy</div>
         <h3>A peregrine falcon dives</h3>
         <p class="prob">A falcon dives from rest, approaching terminal velocity as air drag
-          builds. Match each plot to the quantity it shows as a function of time:
-          <b>height</b>, <b>speed</b>, or <b>magnitude of acceleration</b>.</p>
-        <figure><img src="asy/falcon.svg" alt="Three unlabeled curves versus time" style="width:96%; max-height:3.9in"></figure>
-        <span class="fmt-chip">answer = connect the columns</span>
+          builds. Connect each plot to the quantity being plotted.</p>
+        <div class="connectrow">
+          <img class="plots" src="asy/falcon_stack.svg" alt="Three unlabeled curves versus time">
+          <div class="wordcol">
+            <div>height</div>
+            <div>speed</div>
+            <div>magnitude of<br>acceleration</div>
+          </div>
+        </div>
         <div class="note"><b>What students are doing:</b> translating a physical story into
           qualitative features of curves — speed saturates, acceleration starts at $g$ and dies away,
           height falls with steepening slope. No numbers come out, and only one matching survives.</div>
@@ -302,7 +311,6 @@
           <b>Click the point in the image</b> where the bob stops and turns around.
           (The point isn't necessarily labeled.)</p>
         <figure><img src="asy/pendulum_click_vector.svg" alt="Pendulum with peg" style="width:64%; max-height:4.6in"></figure>
-        <span class="fmt-chip">answer = a click on the image</span>
         <div class="note"><b>What students are doing:</b> turning energy conservation into a
           <i>spatial</i> commitment — same release height, but on the tighter circle around the peg.
           Clicking $D$ (same height, wrong circle) is a graded near-miss: right law, wrong constraint.</div>
@@ -315,21 +323,22 @@
         <span class="kicker">Weigh evidence</span>
         <div class="course">Introduction to Physics · Thought Experiments</div>
         <h3>Which hypothesis does each observation support?</h3>
-        <p class="prob">Galileo: all objects accelerate alike under gravity.
-          Prof. Impetus (fictional): denser objects accelerate faster.
-          Dr. Vacuum evaluates the evidence — but <i>never considers air drag</i>.
-          Sort each observation by which hypothesis <b>Dr. Vacuum</b> will think it supports.</p>
+        <p class="prob">Galileo claims every object accelerates the same way under gravity.
+          A (fictional) rival, Prof. Impetus, claims denser objects accelerate faster — and that
+          very low-density objects can even accelerate upward. A third scientist, Dr. Vacuum,
+          tries to settle the question with everyday observations, taking each at face value —
+          <i>never accounting for air drag</i>. Sort each observation by which hypothesis
+          Dr. Vacuum will conclude it supports.</p>
         <div class="binmock">
           <div class="bin"><h4>Galileo</h4>
-            <span class="chip">Kepler's laws</span><span class="chip">hammer &amp; feather, Moon</span><span class="chip">balloon falls on Moon</span></div>
+            <span class="chip">Kepler's laws (density never enters)</span><span class="chip">hammer &amp; feather fall together on the Moon</span><span class="chip">a balloon would fall on the Moon</span></div>
           <div class="bin"><h4>Impetus</h4>
-            <span class="chip">crumpled paper falls faster</span><span class="chip">He balloon rises</span></div>
+            <span class="chip">paper falls faster when crumpled tight</span><span class="chip">helium balloons rise</span></div>
           <div class="bin"><h4>Both</h4>
-            <span class="chip">lead balls land together</span></div>
+            <span class="chip">big &amp; small lead balls land together</span></div>
           <div class="bin"><h4>Neither</h4>
-            <span class="chip">skydiver, head-first</span></div>
+            <span class="chip">a skydiver falls faster head-first</span></div>
         </div>
-        <span class="fmt-chip">answer = drag observations into bins</span>
         <div class="note"><b>What students are doing:</b> modeling a <i>flawed</i> reasoner's
           inferences — separating what an experiment seems to show from what it shows.
           Metacognition, graded as a partition.</div>
@@ -339,8 +348,10 @@
         <span class="kicker">Diagnose a stuck solver</span>
         <div class="course">Introduction to Physics · Problem Solving</div>
         <h3>What should each student try next?</h3>
-        <p class="prob">Five students are stuck on the classic string-around-the-Earth puzzle.
-          Match each student's statement to their most productive next step.</p>
+        <p class="prob">Students are stuck on a classic puzzle: a string is tied snugly around
+          Earth's equator; a second string is $6$ m longer and circles the equator at a uniform
+          height. How high above the ground is it? Match each student's statement to their most
+          productive next step.</p>
         <div class="bubbles">
           <div class="bubblerow">
             <div class="bubble">"I don't understand this problem at all. I don't know where to start."</div>
@@ -358,7 +369,6 @@
             <div class="step">Solve an easier related problem</div>
           </div>
         </div>
-        <span class="fmt-chip">answer = connect the columns</span>
         <div class="note"><b>What students are doing:</b> classifying <i>kinds of stuckness</i>
           and prescribing remedies — reasoning about the problem-solving process itself.
           Pólya, auto-graded.</div>
@@ -368,16 +378,18 @@
         <span class="kicker">Interpret a calculation</span>
         <div class="course">Physics 1: Mechanics · Collisions</div>
         <h3>The calculation disagrees with the cradle</h3>
-        <p class="prob">For Newton's cradle, momentum + energy conservation alone predict
-          something different from what the demo shows. Which interpretations are accurate?</p>
-        <figure style="flex:0 0 auto"><img src="asy/cradle.svg" alt="Newton's cradle" style="max-height:2.45in"></figure>
+        <p class="prob">Swing one ball into a Newton's cradle: in the demo, exactly one ball
+          pops out the far side at the incoming speed. But a calculation treating the four resting
+          balls as one block — using only momentum and energy conservation — predicts the incoming
+          ball rebounds while the block slides slowly forward. <i>Both</i> outcomes satisfy the
+          conservation laws. Which interpretations are accurate?</p>
+        <figure style="flex:0 0 auto"><img src="asy/cradle.svg" alt="Newton's cradle" style="max-height:2.2in"></figure>
         <div class="opts">
           <div class="opt"><span class="box"></span><span>Momentum or energy must not actually be conserved in the collisions.</span></div>
           <div class="opt sel"><span class="box">✓</span><span>Elastic collisions + momentum conservation are a good model — but not <i>enough</i>; more modeling assumptions are needed.</span></div>
           <div class="opt sel"><span class="box">✓</span><span>The observed outcome is one solution of the conservation equations; there are many others.</span></div>
           <div class="opt"><span class="box"></span><span>The cradle can't be modeled — only experiment can tell us what happens.</span></div>
         </div>
-        <span class="fmt-chip">answer = select all that apply</span>
         <div class="note"><b>What students are doing:</b> deciding what a calculation does and
           doesn't show — built around a case where theory and demo <i>disagree</i>.</div>
       </div>
@@ -389,12 +401,11 @@
       <div class="minis">
         <div class="mini">
           <div class="thumb">
-            <img class="multi" src="assets/img/shadow_circle.jpg" alt="circular shadow">
-            <img class="multi" src="assets/img/shadow_oval.jpg" alt="oval shadow">
-            <img class="multi" src="assets/img/shadow_line.jpg" alt="line shadow">
+            <img class="multi" src="assets/img/lamp_vertical.jpg" alt="vertical tube lamp" style="max-width:44%">
+            <img class="multi" src="assets/img/lamp_horizontal.jpg" alt="horizontal tube lamp" style="max-width:44%">
           </div>
-          <p><b>Reason with symmetry.</b> Spin or roll a sphere — which actions change its shadow?
-             Mostly: none. (Middle School Physics)</p>
+          <p><b>Reason backward from evidence.</b> A tube lamp is either vertical or horizontal.
+             From each object's shadow photo alone, click which. (Middle School Physics)</p>
         </div>
         <div class="mini">
           <div class="thumb"><img src="asy/balloons.svg" alt="balloons in accelerating car" style="max-height:1.8in"></div>
@@ -464,10 +475,11 @@
     </div>
 
     <div class="panel">
-      <h2>What still needs humans</h2>
-      <p>Proofs, lab write-ups, open design projects, and reflective writing need expert and peer
-         feedback — nuance no key can hold. The claim here is narrower: the <i>graded</i> part of
-         homework can invite the same patterns of thought, so the procedural diet isn't the default.</p>
+      <h2>Where we're using humans</h2>
+      <p>Human feedback is the precious resource. We spend it where nuance pays most:
+         proofs, writing, open-ended design, and discussion. Broad auto-graded problems
+         don't replace that feedback — they conserve it, by keeping the rest of the
+         homework from defaulting to procedure.</p>
     </div>
 
     <div class="panel qrpanel">

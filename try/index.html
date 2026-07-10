@@ -80,6 +80,9 @@
     background: #fff; cursor: pointer; font-weight: 600; margin: 6px 0; text-align: center;
   }
   .colitem.selected { background: var(--navy); color: #fff; }
+  .colitem img { max-height: 96px; max-width: 100%; display: block; margin: 0 auto; pointer-events: none; }
+  .colitem.selected img { filter: invert(1) brightness(2); }
+  #falcon-right { display: flex; flex-direction: column; justify-content: space-around; }
   /* click image */
   .clickwrap { position: relative; display: inline-block; cursor: crosshair; }
   .clickwrap img { display: block; max-width: 100%; }
@@ -132,9 +135,9 @@
 <section class="card" id="falcon">
   <span class="kicker">Interpret graphs</span><span class="coursechip">Physics 1: Mechanics · Forms of Energy</span>
   <h2>A peregrine falcon dives</h2>
-  <p class="prompt">A falcon dives from rest, approaching terminal velocity. Match each plot to the
-    quantity it shows as a function of time. <em>Tap a plot, then tap a quantity.</em> Tap a wire to remove it.</p>
-  <figure><img src="../asy/falcon.svg" alt="Three unlabeled plots (A), (B), (C) versus time" style="width:min(700px,100%)"></figure>
+  <p class="prompt">A falcon dives from rest, approaching terminal velocity as air drag builds.
+    Connect each plot to the quantity being plotted.
+    <em>Tap a plot, then tap a quantity.</em> Tap a wire to remove it.</p>
   <div class="connect" id="falcon-connect">
     <svg class="wires" id="falcon-wires"></svg>
     <div id="falcon-left"></div>
@@ -147,8 +150,8 @@
   </div>
   <div class="expert" id="falcon-expert">
     <strong>What students are doing:</strong> translating a physical story into qualitative features of curves.
-    Speed grows and saturates (B). The magnitude of acceleration starts at <em>g</em> and dies away (A).
-    Height falls ever faster, then at a steady rate (C). Nothing to plug in — and only one matching survives.
+    Speed grows and saturates. The magnitude of acceleration starts at <em>g</em> and dies away.
+    Height falls ever faster, then at a steady rate. Nothing to plug in — and only one matching survives.
   </div>
 </section>
 
@@ -282,9 +285,9 @@ function resetBins(id) {
 /* ---------- column connect ---------- */
 const CONNECT_PROBLEMS = {
   falcon: {
-    left: ["(A)", "(B)", "(C)"],
-    right: ["height", "speed", "acceleration (magnitude)"],
-    key: { 0: 2, 1: 1, 2: 0 }   // A->acceleration, B->speed, C->height
+    left: [{ img: "../asy/falcon_a.svg" }, { img: "../asy/falcon_v.svg" }, { img: "../asy/falcon_y.svg" }],
+    right: ["height", "speed", "magnitude of acceleration"],
+    key: { 0: 2, 1: 1, 2: 0 }   // |a|->acceleration, v->speed, y->height
   }
 };
 const connState = {};
@@ -295,7 +298,9 @@ function buildConnect(id) {
   L.innerHTML = ""; R.innerHTML = "";
   p.left.forEach((t, i) => {
     const el = document.createElement("div");
-    el.className = "colitem"; el.textContent = t; el.dataset.side = "L"; el.dataset.i = i;
+    el.className = "colitem"; el.dataset.side = "L"; el.dataset.i = i;
+    if (t && t.img) { const im = document.createElement("img"); im.src = t.img; im.alt = "plot"; el.appendChild(im); }
+    else { el.textContent = t; }
     el.onclick = () => pickConn(id, el);
     L.appendChild(el);
   });
