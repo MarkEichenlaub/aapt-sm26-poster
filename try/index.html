@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Try the Problems — Auto-Graded Homework that Invites Students to Think Broadly</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <style>
   :root {
     --navy: #1b365d;
@@ -45,17 +47,23 @@
            padding: 8px; border-radius: 8px; background: #eef1f5; }
   .chip {
     background: #fff; border: 2px solid var(--navy); color: var(--navy);
-    padding: 5px 12px; border-radius: 99px; cursor: pointer; user-select: none;
-    font-weight: 600; font-size: 0.92rem;
+    padding: 5px 12px; border-radius: 99px; cursor: grab; user-select: none;
+    font-weight: 600; font-size: 0.92rem; touch-action: none;
   }
   .chip.selected { background: var(--navy); color: #fff; }
-  .chip.right { border-color: var(--green); background: #eef7e0; }
-  .chip.wrong { border-color: var(--red); background: #fdeceb; }
+  .chip.dragging { opacity: 0.4; }
+  .chip.mathchip { border-radius: 10px; padding: 6px 10px; }
+  .dragghost {
+    position: fixed; pointer-events: none; z-index: 1000; opacity: 0.9;
+    background: #fff; border: 2px solid var(--navy); color: var(--navy);
+    padding: 5px 12px; border-radius: 99px; font-weight: 600; font-size: 0.92rem;
+  }
   .bins { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
   .bin {
     border: 2px dashed #9fb0c3; border-radius: 10px; padding: 8px; min-height: 86px;
     background: #fbfcfe; cursor: pointer;
   }
+  .bin.dragover { border-color: var(--green); background: #f2f8e6; }
   .bin h3 { margin: 0 0 6px; font-size: 0.95rem; color: var(--navy); text-align: center; }
   .bin .content { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
   .controls { margin-top: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -67,6 +75,13 @@
   .verdict { font-weight: 700; }
   .verdict.good { color: var(--green); }
   .verdict.bad { color: var(--red); }
+  .hintbox {
+    margin-top: 12px; border-left: 4px solid #f0c419; background: #fdf8e7;
+    padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 0.95rem; display: none;
+  }
+  .hintbox.show { display: block; }
+  .hintbox b { color: var(--navy); }
+  .hintbox figure { margin: 10px 0 2px; }
   .expert {
     margin-top: 12px; border-left: 4px solid var(--lightgreen); background: #f6faec;
     padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 0.95rem; display: none;
@@ -78,6 +93,7 @@
   .colitem {
     border: 2px solid var(--navy); color: var(--navy); border-radius: 10px; padding: 8px 12px;
     background: #fff; cursor: pointer; font-weight: 600; margin: 6px 0; text-align: center;
+    touch-action: none; user-select: none;
   }
   .colitem.selected { background: var(--navy); color: #fff; }
   .colitem img { max-height: 96px; max-width: 100%; display: block; margin: 0 auto; pointer-events: none; }
@@ -86,12 +102,18 @@
   /* click image */
   .clickwrap { position: relative; display: inline-block; cursor: crosshair; }
   .clickwrap img { display: block; max-width: 100%; }
-  .marker {
-    position: absolute; width: 22px; height: 22px; border-radius: 50%;
-    border: 3px solid var(--red); background: rgba(192,57,43,0.25);
-    transform: translate(-50%, -50%); pointer-events: none; display: none;
-  }
   .checkrow { display: flex; gap: 10px; align-items: center; margin: 6px 0; }
+  /* interference table */
+  .inttable { border-collapse: collapse; margin: 10px auto; }
+  .inttable th, .inttable td { padding: 6px 14px; text-align: center; font-size: 0.95rem; }
+  .inttable th { color: var(--navy); border-bottom: 2px solid var(--navy); }
+  .dropzone {
+    display: inline-block; min-width: 54px; min-height: 34px; border: 2px dashed #9fb0c3;
+    border-radius: 8px; background: #fbfcfe; cursor: pointer; vertical-align: middle;
+    padding: 2px 6px;
+  }
+  .dropzone.dragover { border-color: var(--green); background: #f2f8e6; }
+  .dropzone.filled { border-style: solid; border-color: var(--navy); }
   footer { text-align: center; color: #5a6b7e; font-size: 0.85rem; padding: 30px 10px 40px; }
   footer a { color: var(--navy); }
 </style>
@@ -100,7 +122,7 @@
 <header>
   <div class="wrap">
     <h1>Try the Problems</h1>
-    <p>Live, auto-graded re-implementations of five problems from the poster
+    <p>Live, auto-graded re-implementations of seven problems from the poster
       <em>Auto-Graded Homework that Invites Students to Think Broadly</em> —
       Mark Eichenlaub, Art of Problem Solving · AAPT Summer Meeting 2026, Pasadena.
       <a href="../">Back to the poster page</a></p>
@@ -114,7 +136,7 @@
   <h2>Heavier, lighter, or normal?</h2>
   <p class="prompt">A car drives along a hilly road <strong>at constant speed</strong> (side view below).
     At each labeled point, does the driver feel heavier than, the same as, or lighter than their normal weight?
-    <em>Tap a label, then tap a bin.</em></p>
+    <em>Drag each label to a bin (or tap the label, then the bin).</em></p>
   <figure><img src="../asy/road.svg" alt="Side view of a hilly road with points A through E" style="width:min(640px,100%)"></figure>
   <div class="chips" id="road-tray"></div>
   <div class="bins" id="road-bins"></div>
@@ -123,10 +145,11 @@
     <button class="secondary" onclick="resetBins('road')">Reset</button>
     <span class="verdict" id="road-verdict"></span>
   </div>
+  <div class="hintbox" id="road-hint"></div>
   <div class="expert" id="road-expert">
     <strong>What students are doing:</strong> reading <em>curvature</em> off a picture.
-    Valley bottoms (B, E) curve upward — the road must push extra hard, so the driver feels heavier.
-    Hilltops (C) curve away — lighter. Straight stretches (A, D), even slanted ones, add nothing.
+    Valley bottoms curve upward — the road must push extra hard, so the driver feels heavier.
+    Hilltops curve away — lighter. Straight stretches, even slanted ones, add nothing.
     No numbers are computed, but the answer is graded instantly.
   </div>
 </section>
@@ -137,7 +160,7 @@
   <h2>A peregrine falcon dives</h2>
   <p class="prompt">A falcon dives from rest, approaching terminal velocity as air drag builds.
     Connect each plot to the quantity being plotted.
-    <em>Tap a plot, then tap a quantity.</em> Tap a wire to remove it.</p>
+    <em>Drag from a plot to a quantity (or tap one, then the other).</em> Tap a wire to remove it.</p>
   <div class="connect" id="falcon-connect">
     <svg class="wires" id="falcon-wires"></svg>
     <div id="falcon-left"></div>
@@ -148,6 +171,7 @@
     <button class="secondary" onclick="resetConnect('falcon')">Reset</button>
     <span class="verdict" id="falcon-verdict"></span>
   </div>
+  <div class="hintbox" id="falcon-hint"></div>
   <div class="expert" id="falcon-expert">
     <strong>What students are doing:</strong> translating a physical story into qualitative features of curves.
     Speed grows and saturates. The magnitude of acceleration starts at <em>g</em> and dies away.
@@ -157,27 +181,45 @@
 
 <!-- ===================== 3. GALILEO PENDULUM (click on image) ===================== -->
 <section class="card" id="pend">
-  <span class="kicker">Commit to a prediction</span><span class="coursechip">Introduction to Physics · Conservation Laws</span>
+  <span class="kicker">Predict an experiment</span><span class="coursechip">Introduction to Physics · Conservation Laws</span>
   <h2>Where does the pendulum stop?</h2>
-  <p class="prompt">Galileo releases a pendulum from point <strong>C</strong>. Swinging through the bottom
-    <strong>B</strong>, the string catches on a peg at <strong>E</strong>, and the lower part swings on around it.
-    <strong>Click the point in the image</strong> where the bob stops and turns around.
-    (The point you're clicking is not necessarily labeled. Assume an ideal pendulum.)</p>
+  <p class="prompt">A pendulum swings back and forth. A thin peg is suddenly inserted directly
+    beneath the pivot. When the string hits the peg, the peg becomes the new pivot.
+    <strong>Click on the point</strong> where the bob stops and turns around.
+    Your click marks a small circle: you're claiming the stopping point is inside it.
+    (Assume an ideal pendulum.)</p>
   <figure>
-    <span class="clickwrap" id="pend-wrap">
-      <img src="../assets/img/pendulum_click.png" id="pend-img" alt="Pendulum with pivot A, peg E, release point C, points B and D">
-      <span class="marker" id="pend-marker"></span>
-    </span>
+    <svg id="pend-svg" viewBox="0 0 600 340" style="width:min(560px,100%); cursor:crosshair; background:#fff">
+      <!-- ceiling -->
+      <line x1="128" y1="40" x2="472" y2="40" stroke="#22303f" stroke-width="3.5"/>
+      <!-- original swing arc (dotted) -->
+      <path d="M 158.5 208.5 A 220 220 0 0 0 441.5 208.5" fill="none" stroke="#22303f"
+            stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"/>
+      <!-- string, descended toward vertical, right of vertical -->
+      <line x1="300" y1="40" x2="360.6" y2="251.5" stroke="#22303f" stroke-width="2"/>
+      <!-- bob -->
+      <circle cx="360.6" cy="251.5" r="12" fill="#999" stroke="#22303f" stroke-width="1.6"/>
+      <!-- pivot -->
+      <circle cx="300" cy="40" r="3.5" fill="#22303f"/>
+      <!-- peg -->
+      <circle cx="300" cy="156.6" r="7" fill="#8c5427" stroke="#5a3517" stroke-width="1.5"/>
+      <text x="286" y="161" text-anchor="end" font-size="17" fill="#5a3517">peg</text>
+      <!-- feedback layer (drawn by JS) -->
+      <g id="pend-feedback"></g>
+      <!-- student's committed circle -->
+      <circle id="pend-circle" r="26" fill="none" stroke="var(--red)" stroke-width="3" style="display:none"/>
+    </svg>
   </figure>
   <div class="controls">
     <button onclick="checkPend()">Check my answer</button>
     <button class="secondary" onclick="resetPend()">Reset</button>
     <span class="verdict" id="pend-verdict"></span>
   </div>
+  <div class="hintbox" id="pend-hint"></div>
   <div class="expert" id="pend-expert">
     <strong>What students are doing:</strong> using energy conservation to make a <em>spatial</em> commitment.
-    The bob must return to its release height — but on the tighter circle around the peg <strong>E</strong>.
-    Clicking <strong>D</strong> (same height, original arc) is the classic near-miss: right conservation law,
+    The bob must return to its release height — but on the tighter circle around the peg.
+    Clicking the no-peg stopping point is the classic near-miss: right conservation law,
     wrong constraint. A grader that accepts a click can tell those two ideas apart.
   </div>
 </section>
@@ -186,10 +228,12 @@
 <section class="card" id="fountain">
   <span class="kicker">Measure the world from a photo</span><span class="coursechip">Physics 1: Mechanics · Projectile Motion</span>
   <h2>Fit the fountain</h2>
-  <p class="prompt">This fountain shoots water across the Chicago River. Axes are overlaid in units of
-    10&thinsp;m. Adjust the coefficients until <em>your</em> parabola (dashed yellow) fits the stream:
+  <p class="prompt">This fountain shoots water across the Chicago River, and you want to figure out
+    <strong>how fast the water is being shot out</strong> (a follow-up problem computes the speed from your fit).
+    Axes are overlaid in units of 10&thinsp;m. Adjust the coefficients of your (red) parabola:
     <em>y</em>/10&thinsp;m = <em>a</em>·(<em>x</em>/10&thinsp;m)² + <em>b</em>.
-    The grader accepts any fit within a narrow band. (The thin red curve is one class's best fit.)</p>
+    You will <em>not</em> be able to fit the entire arc — the stream is not a perfect parabola.
+    Think about which part of the water's path it's most important to match, and fit that part as well as you can.</p>
   <figure>
     <span class="clickwrap" id="fountain-wrap" style="cursor:default; max-width:560px; display:inline-block; position:relative;">
       <img src="../assets/img/fountain_fit_crop.jpg" id="fountain-img" alt="Fountain arc over a river with axes overlay" style="display:block; width:100%;">
@@ -197,23 +241,24 @@
     </span>
   </figure>
   <div class="checkrow">
-    <label style="flex:0 0 auto; font-weight:700; color:var(--navy);">a = <span id="fountain-aval">-0.10</span></label>
-    <input type="range" id="fountain-a" min="-0.60" max="0" step="0.01" value="-0.10" style="flex:1" oninput="drawFountain()">
+    <label style="flex:0 0 auto; font-weight:700; color:var(--navy);">a = <span id="fountain-aval">-0.03</span></label>
+    <input type="range" id="fountain-a" min="-0.60" max="0" step="0.01" value="-0.03" style="flex:1" oninput="drawFountain()">
   </div>
   <div class="checkrow">
-    <label style="flex:0 0 auto; font-weight:700; color:var(--navy);">b = <span id="fountain-bval">0.40</span></label>
-    <input type="range" id="fountain-b" min="0" max="0.60" step="0.01" value="0.40" style="flex:1" oninput="drawFountain()">
+    <label style="flex:0 0 auto; font-weight:700; color:var(--navy);">b = <span id="fountain-bval">0.10</span></label>
+    <input type="range" id="fountain-b" min="0" max="0.60" step="0.01" value="0.10" style="flex:1" oninput="drawFountain()">
   </div>
   <div class="controls">
     <button onclick="checkFountain()">Check my answer</button>
     <button class="secondary" onclick="resetFountain()">Reset</button>
     <span class="verdict" id="fountain-verdict"></span>
   </div>
+  <div class="hintbox" id="fountain-hint"></div>
   <div class="expert" id="fountain-expert">
-    <strong>What students are doing:</strong> measuring the world from a photograph — mapping a real
-    stream onto a quadratic model. A careful fitter notices the left side of the arc droops below any
-    parabola: air drag steals horizontal speed. The graded answer is just two numbers with tolerance,
-    but the activity is model-fitting against reality.
+    <strong>What students are doing:</strong> fitting a model against reality — and deciding
+    <em>where the model deserves to fit</em>. By the left side of the arc, air drag has pushed
+    the water well off any parabola, so the freshly-launched right side is the part to match.
+    The graded answer is two numbers with tolerance; the activity is physical judgment.
   </div>
 </section>
 
@@ -225,39 +270,215 @@
     upside down <em>and</em> left–right reversed. Which of these letters would look <strong>identical to normal</strong>
     in the projected image? Select all that apply. (Assume the most symmetric font for each letter.)</p>
   <div class="chips" id="obscura-tray" style="background:transparent; padding:0;">
-    <span class="chip" data-i="0" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px;">A</span>
-    <span class="chip" data-i="1" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px;">E</span>
-    <span class="chip" data-i="2" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px;">F</span>
-    <span class="chip" data-i="3" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px;">H</span>
-    <span class="chip" data-i="4" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px;">Z</span>
+    <span class="chip" data-i="0" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px; cursor:pointer;">A</span>
+    <span class="chip" data-i="1" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px; cursor:pointer;">E</span>
+    <span class="chip" data-i="2" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px; cursor:pointer;">F</span>
+    <span class="chip" data-i="3" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px; cursor:pointer;">H</span>
+    <span class="chip" data-i="4" onclick="toggleMulti(this)" style="font-size:1.4rem; padding:8px 18px; cursor:pointer;">Z</span>
   </div>
   <div class="controls">
     <button onclick="checkObscura()">Check my answer</button>
     <button class="secondary" onclick="resetObscura()">Reset</button>
     <span class="verdict" id="obscura-verdict"></span>
   </div>
+  <div class="hintbox" id="obscura-hint"></div>
   <div class="expert" id="obscura-expert">
     <strong>What students are doing:</strong> discovering that "flipped up–down <em>and</em> left–right" is the same as
-    rotating 180° — so a letter survives exactly when it has two-fold rotational symmetry. H and Z do; A, E, and F don't.
+    rotating 180° — so a letter survives exactly when it has two-fold rotational symmetry.
     Mentally rotating letters is the whole task; the finite answer set is what makes it gradable.
+  </div>
+</section>
+
+<!-- ===================== 6. LENGTH, AREA, OR VOLUME (drag into categories) ===================== -->
+<section class="card" id="lav">
+  <span class="kicker">Interpret an expression</span><span class="coursechip">Introduction to Physics · Dimensional Analysis</span>
+  <h2>Length, area, or volume?</h2>
+  <p class="prompt">Every <span style="color:var(--red); font-weight:700;">red</span> variable below is a
+    length of some kind — <em>a</em> might be a side length, <em>r</em> a radius. (π is just a number;
+    it has no dimensions.) You don't need to know where these expressions come from: just from how the
+    lengths are added, multiplied, squared, and square-rooted, classify each expression as a length,
+    an area, or a volume.
+    <em>Drag each expression to a bin (or tap it, then the bin).</em></p>
+  <div class="chips" id="lav-tray"></div>
+  <div class="bins" id="lav-bins"></div>
+  <div class="controls">
+    <button onclick="checkBins('lav')">Check my answer</button>
+    <button class="secondary" onclick="resetBins('lav')">Reset</button>
+    <span class="verdict" id="lav-verdict"></span>
+  </div>
+  <div class="hintbox" id="lav-hint"></div>
+  <div class="expert" id="lav-expert">
+    <strong>What students are doing:</strong> reading mathematical <em>structure</em> without context —
+    dimensional analysis as a way to make sense of formulas you've never seen.
+    (These are real formulas: a 3-D diagonal, a triangle's area, a frustum's surface, a cell
+    biologist's estimate of the endoplasmic reticulum's area…)
+  </div>
+</section>
+
+<!-- ===================== 7. INTERFERENCE TABLE (drag equation pieces) ===================== -->
+<section class="card" id="intf">
+  <span class="kicker">Complete the pattern</span><span class="coursechip">Middle School Physics 1 · Interference</span>
+  <h2>Two waves meet</h2>
+  <p class="prompt">Two identical repeating waves of amplitude <em>A</em> move in the same direction.
+    For any phase difference between them, some type of interference occurs and there is a resulting
+    amplitude. <em>Drag one of the three choices into each empty slot</em> (chips can be reused), or tap
+    a chip and then a slot. Tap a filled slot to clear it.</p>
+  <div class="chips" id="intf-tray" style="justify-content:center;"></div>
+  <table class="inttable">
+    <tr><th>Phase difference<br>(degrees)</th><th>Phase difference<br>(wavelengths)</th><th>Type of<br>interference</th><th>Resultant<br>amplitude</th></tr>
+    <tr><td>0</td><td>0</td><td>Fully constructive</td><td><span class="dropzone" data-row="0"></span></td></tr>
+    <tr><td>120</td><td>0.33</td><td>Intermediate</td><td><span class="dropzone" data-row="1"></span></td></tr>
+    <tr><td>180</td><td>0.50</td><td>Fully destructive</td><td><span class="dropzone" data-row="2"></span></td></tr>
+    <tr><td>240</td><td>0.67</td><td>Intermediate</td><td><span class="dropzone" data-row="3"></span></td></tr>
+    <tr><td>360</td><td>1.00</td><td>Fully constructive</td><td><span class="dropzone" data-row="4"></span></td></tr>
+  </table>
+  <div class="controls">
+    <button onclick="checkIntf()">Check my answer</button>
+    <button class="secondary" onclick="resetIntf()">Reset</button>
+    <span class="verdict" id="intf-verdict"></span>
+  </div>
+  <div class="hintbox" id="intf-hint"></div>
+  <div class="expert" id="intf-expert">
+    <strong>What students are doing:</strong> assembling the superposition pattern piece by piece —
+    crest-on-crest doubles, crest-on-trough cancels, and everything else lands in between.
+    Dragging equation pieces makes the pattern the answer, with nothing to compute.
   </div>
 </section>
 
 <footer>
   These demos re-implement AoPS "motor" interactive problem types (drag-into-categories, column-connect,
-  click-on-image, curve-fitting, multi-select) for illustration. The originals run inside
-  <a href="https://artofproblemsolving.com/online">AoPS Online</a> courses with full solutions and feedback.
+  click-on-image, curve-fitting, multi-select, drag-and-drop equations) for illustration. The originals run inside
+  <a href="https://artofproblemsolving.com/online">AoPS Online</a> courses with full solutions, discussion
+  threads, and hints — including hints written for specific common wrong answers.
 </footer>
 </main>
 
 <script>
-/* ---------- generic bins widget ---------- */
+/* =========================================================================
+   Shared: escalating hints + pointer-based dragging
+   ========================================================================= */
+const hintCount = {};
+function showHint(id, html) {
+  const box = document.getElementById(id + "-hint");
+  box.innerHTML = html;
+  box.classList.add("show");
+}
+function clearHint(id) {
+  const box = document.getElementById(id + "-hint");
+  box.classList.remove("show");
+  box.innerHTML = "";
+  hintCount[id] = 0;
+}
+
+/* Generic pointer-drag: call makeDraggable(el, dropSelector, onDrop).
+   Also leaves click behavior alone (drag only starts after 6px movement). */
+function makeDraggable(el, dropSelector, onDrop) {
+  el.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    const startX = e.clientX, startY = e.clientY;
+    let ghost = null, dragging = false, lastTarget = null;
+
+    const move = (ev) => {
+      if (!dragging && Math.hypot(ev.clientX - startX, ev.clientY - startY) < 6) return;
+      if (!dragging) {
+        dragging = true;
+        el.classList.add("dragging");
+        ghost = document.createElement("span");
+        ghost.className = "dragghost";
+        ghost.innerHTML = el.innerHTML;
+        document.body.appendChild(ghost);
+      }
+      ghost.style.left = (ev.clientX + 8) + "px";
+      ghost.style.top = (ev.clientY + 10) + "px";
+      const under = document.elementFromPoint(ev.clientX, ev.clientY);
+      const target = under ? under.closest(dropSelector) : null;
+      if (lastTarget && lastTarget !== target) lastTarget.classList.remove("dragover");
+      if (target) target.classList.add("dragover");
+      lastTarget = target;
+    };
+    const up = (ev) => {
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerup", up);
+      if (ghost) ghost.remove();
+      el.classList.remove("dragging");
+      if (lastTarget) lastTarget.classList.remove("dragover");
+      if (dragging) {
+        const under = document.elementFromPoint(ev.clientX, ev.clientY);
+        const target = under ? under.closest(dropSelector) : null;
+        if (target) onDrop(el, target);
+        // swallow the click that follows a drag
+        el.addEventListener("click", (ce) => ce.stopPropagation(), {capture: true, once: true});
+      }
+    };
+    document.addEventListener("pointermove", move);
+    document.addEventListener("pointerup", up);
+  });
+}
+
+/* KaTeX helper (KaTeX loads deferred; render after DOMContentLoaded) */
+function tex(el, s) { katex.render(s, el, {throwOnError: false}); }
+
+/* =========================================================================
+   Bins widgets: hilly road + length/area/volume
+   ========================================================================= */
 const BIN_PROBLEMS = {
   road: {
     chips: ["A", "B", "C", "D", "E"],
     bins: ["heavier", "the same", "lighter"],
-    // answer: bin index for each chip index  (heavier: B,E — same: A,D — lighter: C)
-    key: { 0: 1, 1: 0, 2: 2, 3: 1, 4: 0 }
+    // heavier: B,E — same: A,D — lighter: C
+    key: { 0: 1, 1: 0, 2: 2, 3: 1, 4: 0 },
+    math: false,
+    hints: [
+      // Hint 1: osculating circle + direction of acceleration, with figure
+      `<b>Hint 1:</b> At each point, pretend the road is momentarily a circle (a circle "kissing"
+       the road at that point). Moving on a circle at constant speed, your acceleration points
+       <em>toward the circle's center</em>. At the hilltop C, the circle sits below the road,
+       so the car's acceleration points straight down:
+       <figure><svg viewBox="0 0 240 150" style="width:230px">
+         <path d="M 15 105 Q 120 15 225 105" fill="none" stroke="#22303f" stroke-width="3"/>
+         <circle cx="120" cy="106" r="46" fill="none" stroke="#9fb0c3" stroke-width="2" stroke-dasharray="6 5"/>
+         <circle cx="120" cy="60" r="7" fill="#1b365d"/>
+         <text x="132" y="55" font-size="15" fill="#1b365d" font-weight="bold">C</text>
+         <line x1="120" y1="72" x2="120" y2="98" stroke="#c0392b" stroke-width="3.5"/>
+         <polygon points="120,106 114,95 126,95" fill="#c0392b"/>
+         <text x="130" y="95" font-size="15" fill="#c0392b" font-style="italic">a</text>
+       </svg></figure>
+       Draw the acceleration of the car this way at each labeled point. Where the road is straight
+       — even on a slope — there's no curve, so no extra acceleration at all.`,
+      // Hint 2: explicit normal-force reasoning at C
+      `<b>Hint 2:</b> At C the car accelerates <em>downward</em>. Gravity already pulls down, so
+       for the net force to point down, the road must push up <em>less</em> than usual — the
+       normal force weakens, and the driver feels <em>lighter</em>. Now make the same argument
+       at each point: which way does the acceleration point, and must the normal force (the
+       "weight" you feel) be stronger or weaker than usual to produce it?`
+    ]
+  },
+  lav: {
+    chips: [
+      "\\sqrt{\\textcolor{#c0392b}{a}^2+\\textcolor{#c0392b}{b}^2+\\textcolor{#c0392b}{c}^2}",
+      "\\dfrac{\\sqrt{2}}{2}\\,\\textcolor{#c0392b}{a}^2\\textcolor{#c0392b}{b}",
+      "\\dfrac{8\\pi}{3\\textcolor{#c0392b}{d}}\\left(\\textcolor{#c0392b}{r_1}^3-\\textcolor{#c0392b}{r_2}^3\\right)",
+      "\\pi(\\textcolor{#c0392b}{R}+\\textcolor{#c0392b}{r})\\sqrt{(\\textcolor{#c0392b}{R}-\\textcolor{#c0392b}{r})^2+\\textcolor{#c0392b}{h}^2}",
+      "\\sqrt{\\textcolor{#c0392b}{abc}(\\textcolor{#c0392b}{a}+\\textcolor{#c0392b}{b}+\\textcolor{#c0392b}{c})}",
+      "\\textcolor{#c0392b}{a}^3"
+    ],
+    bins: ["length", "area", "volume"],
+    // key: diag->L, a²b->V, (8π/3d)(r³-r³)->A, frustum->A, Heron->A, a³->V
+    key: { 0: 0, 1: 2, 2: 1, 3: 1, 4: 1, 5: 2 },
+    math: true,
+    hints: [
+      `<b>Hint (from the AoPS course):</b> Try replacing every red variable by
+       $\\mathrm{L}$ and ignoring the constants. For example,
+       $\\dfrac{8\\pi}{3d}\\left(r_1^3-r_2^3\\right)$ becomes
+       $\\dfrac{1}{\\mathrm{L}}(\\mathrm{L}^3-\\mathrm{L}^3)$. Remember that
+       $\\mathrm{L}^3-\\mathrm{L}^3=\\mathrm{L}^3$, not zero — subtracting one volume from
+       another gives a volume. So this expression simplifies to
+       $\\dfrac{1}{\\mathrm{L}}\\mathrm{L}^3=\\mathrm{L}^2$: an area.`,
+      `<b>Hint 2:</b> Adding lengths gives a length. A square root <em>halves</em> the power:
+       $\\sqrt{\\mathrm{L}^2}=\\mathrm{L}$ and $\\sqrt{\\mathrm{L}^4}=\\mathrm{L}^2$.
+       Dividing by a length lowers the power by one. Work outward from the innermost part
+       of each expression.`
+    ]
   }
 };
 let selectedChip = null;
@@ -269,8 +490,14 @@ function buildBins(id) {
   tray.innerHTML = ""; binsEl.innerHTML = "";
   p.chips.forEach((c, i) => {
     const el = document.createElement("span");
-    el.className = "chip"; el.textContent = c; el.dataset.i = i;
+    el.className = "chip" + (p.math ? " mathchip" : "");
+    el.dataset.i = i;
+    if (p.math) { tex(el, c); } else { el.textContent = c; }
     el.onclick = (e) => { e.stopPropagation(); selectChip(el); };
+    makeDraggable(el, "#" + id + "-bins .bin", (chip, bin) => {
+      bin.querySelector(".content").appendChild(chip);
+      chip.classList.remove("selected");
+    });
     tray.appendChild(el);
   });
   p.bins.forEach((b, j) => {
@@ -299,30 +526,47 @@ function checkBins(id) {
     const j = +bin.dataset.j;
     bin.querySelectorAll(".chip").forEach(ch => {
       placed++;
-      const ok = p.key[+ch.dataset.i] === j;
-      ch.classList.toggle("right", ok);
-      ch.classList.toggle("wrong", !ok);
-      if (!ok) all = false;
+      if (p.key[+ch.dataset.i] !== j) all = false;
     });
   });
   const v = document.getElementById(id + "-verdict");
-  if (placed < p.chips.length) { v.textContent = "Place all " + p.chips.length + " labels first."; v.className = "verdict bad"; return; }
-  v.textContent = all ? "Correct!" : "Not quite — red ones are misplaced.";
-  v.className = "verdict " + (all ? "good" : "bad");
-  document.getElementById(id + "-expert").classList.add("show");
+  if (placed < p.chips.length) {
+    v.textContent = "Place all " + p.chips.length + " items first.";
+    v.className = "verdict bad";
+    return;
+  }
+  if (all) {
+    v.textContent = "Correct!";
+    v.className = "verdict good";
+    document.getElementById(id + "-expert").classList.add("show");
+  } else {
+    v.textContent = "Not accepted yet — try again.";
+    v.className = "verdict bad";
+    const n = hintCount[id] = (hintCount[id] || 0) + 1;
+    const hint = p.hints[Math.min(n, p.hints.length) - 1];
+    showHint(id, hint);
+    if (typeof renderMathIn === "function") renderMathIn(document.getElementById(id + "-hint"));
+  }
 }
 function resetBins(id) {
   buildBins(id);
   document.getElementById(id + "-verdict").textContent = "";
   document.getElementById(id + "-expert").classList.remove("show");
+  clearHint(id);
 }
 
-/* ---------- column connect ---------- */
+/* =========================================================================
+   Column connect (falcon) — click-click or drag
+   ========================================================================= */
 const CONNECT_PROBLEMS = {
   falcon: {
     left: [{ img: "../asy/falcon_a.svg" }, { img: "../asy/falcon_v.svg" }, { img: "../asy/falcon_y.svg" }],
     right: ["height", "speed", "magnitude of acceleration"],
-    key: { 0: 2, 1: 1, 2: 0 }   // |a|->acceleration, v->speed, y->height
+    key: { 0: 2, 1: 1, 2: 0 },   // |a|->acceleration, v->speed, y->height
+    hint: `<b>Hint (from the AoPS course):</b> First, think about whether each plot should begin
+      at some higher value and decrease, or begin at zero and increase. Then think about what
+      happens as the bird approaches terminal velocity: does the plot level off toward a
+      horizontal asymptote, or approach a straight line?`
   }
 };
 const connState = {};
@@ -331,20 +575,24 @@ function buildConnect(id) {
   connState[id] = { pairs: {}, sel: null };
   const L = document.getElementById(id + "-left"), R = document.getElementById(id + "-right");
   L.innerHTML = ""; R.innerHTML = "";
-  p.left.forEach((t, i) => {
+  const makeItem = (t, i, side) => {
     const el = document.createElement("div");
-    el.className = "colitem"; el.dataset.side = "L"; el.dataset.i = i;
+    el.className = "colitem"; el.dataset.side = side; el.dataset.i = i;
     if (t && t.img) { const im = document.createElement("img"); im.src = t.img; im.alt = "plot"; el.appendChild(im); }
     else { el.textContent = t; }
     el.onclick = () => pickConn(id, el);
-    L.appendChild(el);
-  });
-  p.right.forEach((t, i) => {
-    const el = document.createElement("div");
-    el.className = "colitem"; el.textContent = t; el.dataset.side = "R"; el.dataset.i = i;
-    el.onclick = () => pickConn(id, el);
-    R.appendChild(el);
-  });
+    makeDraggable(el, "#" + id + "-connect .colitem", (item, target) => {
+      if (target.dataset.side === item.dataset.side) return;
+      const l = item.dataset.side === "L" ? +item.dataset.i : +target.dataset.i;
+      const r = item.dataset.side === "R" ? +item.dataset.i : +target.dataset.i;
+      connState[id].pairs[l] = r;
+      if (connState[id].sel) { connState[id].sel.classList.remove("selected"); connState[id].sel = null; }
+      drawWires(id);
+    });
+    return el;
+  };
+  p.left.forEach((t, i) => L.appendChild(makeItem(t, i, "L")));
+  p.right.forEach((t, i) => R.appendChild(makeItem(t, i, "R")));
   drawWires(id);
 }
 function pickConn(id, el) {
@@ -388,60 +636,132 @@ function checkConnect(id) {
   if (Object.keys(st.pairs).length < p.left.length) {
     v.textContent = "Connect all " + p.left.length + " plots first."; v.className = "verdict bad"; return;
   }
-  drawWires(id, true);
   const all = Object.entries(st.pairs).every(([l, r]) => p.key[l] === +r);
-  v.textContent = all ? "Correct!" : "Not quite — red wires are wrong.";
-  v.className = "verdict " + (all ? "good" : "bad");
-  document.getElementById(id + "-expert").classList.add("show");
+  if (all) {
+    drawWires(id, true);
+    v.textContent = "Correct!";
+    v.className = "verdict good";
+    document.getElementById(id + "-expert").classList.add("show");
+  } else {
+    v.textContent = "Not accepted yet — try again.";
+    v.className = "verdict bad";
+    showHint(id, p.hint);
+  }
 }
 function resetConnect(id) {
   buildConnect(id);
   document.getElementById(id + "-verdict").textContent = "";
   document.getElementById(id + "-expert").classList.remove("show");
+  clearHint(id);
 }
 
-/* ---------- click on image ---------- */
-/* Correct point: on the circle about peg E, at the release height of C.
-   Fractions of natural image size (574 x 453): target (0.239, 0.711), r 0.09.
-   D (0.09, 0.711) is the classic distractor: same height, original arc. */
-let pendClick = null;
-document.getElementById("pend-wrap").addEventListener("click", (e) => {
-  const img = document.getElementById("pend-img");
-  const r = img.getBoundingClientRect();
-  const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
-  pendClick = { fx, fy };
-  const m = document.getElementById("pend-marker");
-  m.style.left = (fx * 100) + "%"; m.style.top = (fy * 100) + "%"; m.style.display = "block";
+/* =========================================================================
+   Pendulum: click-on-image with committed circle + drawn feedback
+   =========================================================================
+   Model coords: pivot (0,0), string length 1, release angle 40°, peg at (0,-0.53).
+   SVG mapping: (x,y) -> (300 + 220x, 40 - 220y).
+   Correct stopping point: on the circle about the peg (radius 0.47), at the
+   release height y = -cos40° = -0.766  =>  x = -0.4065.
+   No-peg distractor: (-0.643, -0.766)  (mirror of the release point).      */
+const PEND = {
+  toSvg: (x, y) => [300 + 220 * x, 40 - 220 * y],
+  T: { x: -0.4065, y: -0.766 },   // correct
+  D: { x: -0.643,  y: -0.766 },   // no-peg near-miss
+  tol: 26 / 220                    // committed-circle radius in model units
+};
+let pendClick = null;              // {x, y} in model coords
+const pendSvg = document.getElementById("pend-svg");
+pendSvg.addEventListener("click", (e) => {
+  const pt = pendSvg.createSVGPoint();
+  pt.x = e.clientX; pt.y = e.clientY;
+  const p = pt.matrixTransform(pendSvg.getScreenCTM().inverse());
+  pendClick = { x: (p.x - 300) / 220, y: (40 - p.y) / 220 };
+  const c = document.getElementById("pend-circle");
+  c.setAttribute("cx", p.x); c.setAttribute("cy", p.y);
+  c.style.display = "block";
+  document.getElementById("pend-feedback").innerHTML = "";
 });
+function pendDist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
 function checkPend() {
   const v = document.getElementById("pend-verdict");
+  const fb = document.getElementById("pend-feedback");
   if (!pendClick) { v.textContent = "Click on the image first."; v.className = "verdict bad"; return; }
-  const T = { x: 0.239, y: 0.711 }, D = { x: 0.09, y: 0.711 };
-  const d = Math.hypot(pendClick.fx - T.x, pendClick.fy - T.y);
-  const dD = Math.hypot(pendClick.fx - D.x, pendClick.fy - D.y);
-  if (d < 0.09) { v.textContent = "Correct!"; v.className = "verdict good"; }
-  else if (dD < 0.07) {
-    v.textContent = "So close — that's where it would stop with NO peg. The string now pivots around E.";
+  fb.innerHTML = "";
+  const NS = "http://www.w3.org/2000/svg";
+  if (pendDist(pendClick, PEND.T) < PEND.tol) {
+    // correct: draw the exact answer as a dot inside the student's circle
+    const [tx, ty] = PEND.toSvg(PEND.T.x, PEND.T.y);
+    const dot = document.createElementNS(NS, "circle");
+    dot.setAttribute("cx", tx); dot.setAttribute("cy", ty); dot.setAttribute("r", 6);
+    dot.setAttribute("fill", "#61ad00");
+    fb.appendChild(dot);
+    v.textContent = "Correct! The exact stopping point is the green dot inside your circle.";
+    v.className = "verdict good";
+    document.getElementById("pend-expert").classList.add("show");
+    clearHint("pend");
+  } else if (pendDist(pendClick, PEND.D) < 0.09) {
+    // classic near-miss: no-peg stopping point. Draw the new (tighter) arc so far.
+    // Small circle about the peg: center (300,156.6), r = 103.4; its bottom
+    // coincides with the original arc's bottom, then it climbs above the old arc.
+    const arc = document.createElementNS(NS, "path");
+    arc.setAttribute("d", "M 300 260 A 103.4 103.4 0 0 1 210.4 205.2");
+    arc.setAttribute("fill", "none");
+    arc.setAttribute("stroke", "#c0392b");
+    arc.setAttribute("stroke-width", "2.5");
+    arc.setAttribute("stroke-dasharray", "8 6");
+    fb.appendChild(arc);
+    // pendulum having already caught on the peg
+    const s1 = document.createElementNS(NS, "line");
+    s1.setAttribute("x1", 300); s1.setAttribute("y1", 40);
+    s1.setAttribute("x2", 300); s1.setAttribute("y2", 156.6);
+    s1.setAttribute("stroke", "#8a97a8"); s1.setAttribute("stroke-width", "2");
+    const s2 = document.createElementNS(NS, "line");
+    s2.setAttribute("x1", 300); s2.setAttribute("y1", 156.6);
+    s2.setAttribute("x2", 226.9); s2.setAttribute("y2", 229.7);
+    s2.setAttribute("stroke", "#8a97a8"); s2.setAttribute("stroke-width", "2");
+    const bob = document.createElementNS(NS, "circle");
+    bob.setAttribute("cx", 226.9); bob.setAttribute("cy", 229.7); bob.setAttribute("r", 10);
+    bob.setAttribute("fill", "#cfd6df"); bob.setAttribute("stroke", "#8a97a8"); bob.setAttribute("stroke-width", "1.5");
+    fb.appendChild(s1); fb.appendChild(s2); fb.appendChild(bob);
+    v.textContent = "Not in that circle.";
     v.className = "verdict bad";
-  } else if (Math.abs(pendClick.fy - T.y) < 0.06) {
-    v.textContent = "Right height! But the bob swings on the circle around the peg E.";
-    v.className = "verdict bad";
+    showHint("pend", `<b>So close — but that's where the bob would stop with no peg.</b>
+      Once the string catches, the bob pivots around the <em>peg</em>, following a new, tighter
+      arc (dashed). The dashed arc shares the same bottom as the original swing but rises more
+      steeply because its radius is smaller. Where along that tighter arc does the bob run out
+      of kinetic energy?`);
   } else {
-    v.textContent = "Not quite. Think about what energy conservation says about the stopping height.";
+    // any other miss: energy-conservation hint + dotted same-height line
+    const [x1, y1] = PEND.toSvg(PEND.D.x, PEND.D.y);
+    const [x2, y2] = PEND.toSvg(0.643, -0.766);
+    const line = document.createElementNS(NS, "line");
+    line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+    line.setAttribute("stroke", "#8a97a8"); line.setAttribute("stroke-width", "2");
+    line.setAttribute("stroke-dasharray", "3 6");
+    fb.appendChild(line);
+    v.textContent = "Not in that circle.";
     v.className = "verdict bad";
+    showHint("pend", `<b>Hint (from the AoPS course):</b> There are two conservation laws at play
+      here — energy conservation, and the "conservation of string." Without the peg, energy
+      conservation means the bob always rises to the same height on either side (the dotted
+      horizontal line just drawn). The peg doesn't change the bob's energy… but it does change
+      which circle the bob moves along.`);
   }
-  document.getElementById("pend-expert").classList.add("show");
 }
 function resetPend() {
   pendClick = null;
-  document.getElementById("pend-marker").style.display = "none";
+  document.getElementById("pend-circle").style.display = "none";
+  document.getElementById("pend-feedback").innerHTML = "";
   document.getElementById("pend-verdict").textContent = "";
   document.getElementById("pend-expert").classList.remove("show");
+  clearHint("pend");
 }
 
-/* ---------- fountain parabola fit ---------- */
-/* mapping recovered from the course's best-fit curve: origin (527.5, 531.0) px,
-   347.8 px per 10 m unit, in the 1062x1055 cropped image */
+/* =========================================================================
+   Fountain parabola fit — the student drives the red parabola; no target
+   =========================================================================
+   Mapping: origin (527.5, 531.0) px, 347.8 px per 10 m, in the 1062x1055 image. */
 const FTN = { ox: 527.5, oy: 531.0, U: 347.8, W: 1062, H: 1055 };
 function drawFountain() {
   const a = parseFloat(document.getElementById("fountain-a").value);
@@ -455,57 +775,193 @@ function drawFountain() {
     if (py >= -40 && py <= FTN.H + 40) pts.push(px.toFixed(0) + "," + py.toFixed(1));
   }
   document.getElementById("fountain-svg").innerHTML =
-    "<polyline points='" + pts.join(" ") + "' fill='none' stroke='#ffd23e' stroke-width='7' stroke-dasharray='18 12'/>";
+    "<polyline points='" + pts.join(" ") + "' fill='none' stroke='#e8262d' stroke-width='7'/>";
 }
 function checkFountain() {
   const a = parseFloat(document.getElementById("fountain-a").value);
   const b = parseFloat(document.getElementById("fountain-b").value);
   const v = document.getElementById("fountain-verdict");
   const aOK = a >= -0.38 && a <= -0.33, bOK = b >= 0.22 && b <= 0.28;
-  if (aOK && bOK) { v.textContent = "Correct! That fit lands in the accepted band."; v.className = "verdict good"; }
-  else {
-    let hint = [];
-    if (!bOK) hint.push(b > 0.28 ? "your peak is too high" : "your peak is too low");
-    if (!aOK) hint.push(a < -0.38 ? "your arc is too narrow" : "your arc is too wide");
-    v.textContent = "Not yet — " + hint.join("; ") + ".";
+  if (aOK && bOK) {
+    v.textContent = "Correct! That fit lands in the accepted band.";
+    v.className = "verdict good";
+    document.getElementById("fountain-expert").classList.add("show");
+    clearHint("fountain");
+  } else {
+    v.textContent = "Not accepted yet.";
     v.className = "verdict bad";
+    let hint;
+    if (a > -0.33) {
+      // too-wide arc: the classic result of trying to match the drooping left side
+      hint = `<b>Hint:</b> Your parabola is wider than the accepted fit — are you stretching it
+        to match the <em>left</em> side of the stream? Think about which part of the water's
+        path is most important to match with a parabola: the part that has been affected
+        <em>least</em> by air drag. The water on the left has been in the air (and in the wind)
+        the longest.`;
+    } else {
+      const parts = [];
+      if (!bOK) parts.push(b > 0.28 ? "your peak is too high" : "your peak is too low");
+      if (!aOK) parts.push(a < -0.38 ? "your arc is too narrow" : "your arc is too wide");
+      hint = `<b>Hint:</b> ` + parts.join("; ") +
+        `. Match the freshly-launched part of the stream — the side least affected by air
+        drag — as exactly as you can, and let the other side miss.`;
+    }
+    showHint("fountain", hint);
   }
-  document.getElementById("fountain-expert").classList.add("show");
 }
 function resetFountain() {
-  document.getElementById("fountain-a").value = -0.10;
-  document.getElementById("fountain-b").value = 0.40;
+  document.getElementById("fountain-a").value = -0.03;
+  document.getElementById("fountain-b").value = 0.10;
   document.getElementById("fountain-verdict").textContent = "";
   document.getElementById("fountain-expert").classList.remove("show");
+  clearHint("fountain");
   drawFountain();
 }
 drawFountain();
 
-/* ---------- multi select ---------- */
+/* =========================================================================
+   Camera obscura multi-select
+   ========================================================================= */
 function toggleMulti(el) { el.classList.toggle("selected"); }
 function checkObscura() {
   const key = new Set([3, 4]); // H, Z
   let all = true;
   document.querySelectorAll("#obscura-tray .chip").forEach(ch => {
     const i = +ch.dataset.i, sel = ch.classList.contains("selected");
-    const shouldBe = key.has(i);
-    ch.classList.toggle("right", sel && shouldBe);
-    ch.classList.toggle("wrong", sel !== shouldBe && (sel || shouldBe));
-    if (sel !== shouldBe) all = false;
+    if (sel !== key.has(i)) all = false;
   });
   const v = document.getElementById("obscura-verdict");
-  v.textContent = all ? "Correct!" : "Not quite — think about which letters survive a 180° rotation.";
-  v.className = "verdict " + (all ? "good" : "bad");
-  document.getElementById("obscura-expert").classList.add("show");
+  if (all) {
+    v.textContent = "Correct!";
+    v.className = "verdict good";
+    document.getElementById("obscura-expert").classList.add("show");
+    clearHint("obscura");
+  } else {
+    v.textContent = "Not accepted yet — try again.";
+    v.className = "verdict bad";
+    showHint("obscura", `<b>Hint (from the AoPS course):</b> A camera obscura rotates images by
+      180°. Try writing each letter on paper and rotating the paper 180° — which letters look
+      the same afterward? (An E can look normal in a gallery photo of a camera obscura, but
+      answer from your understanding of pinhole images, not from a photo.)`);
+  }
 }
 function resetObscura() {
-  document.querySelectorAll("#obscura-tray .chip").forEach(ch => ch.classList.remove("selected", "right", "wrong"));
+  document.querySelectorAll("#obscura-tray .chip").forEach(ch => ch.classList.remove("selected"));
   document.getElementById("obscura-verdict").textContent = "";
   document.getElementById("obscura-expert").classList.remove("show");
+  clearHint("obscura");
 }
 
-buildBins("road");
-buildConnect("falcon");
+/* =========================================================================
+   Interference table — drag reusable equation pieces into slots
+   ========================================================================= */
+const INTF = {
+  choices: ["0", "A", "2A"],
+  key: [2, 1, 0, 1, 2],       // row answers as choice indices: 2A, A, 0, A, 2A
+  slots: [null, null, null, null, null],
+  sel: null
+};
+function buildIntf() {
+  const tray = document.getElementById("intf-tray");
+  tray.innerHTML = "";
+  INTF.choices.forEach((c, i) => {
+    const el = document.createElement("span");
+    el.className = "chip mathchip";
+    el.dataset.i = i;
+    tex(el, c);
+    el.onclick = (e) => {
+      e.stopPropagation();
+      document.querySelectorAll("#intf-tray .chip").forEach(x => x.classList.remove("selected"));
+      if (INTF.sel === i) { INTF.sel = null; }
+      else { INTF.sel = i; el.classList.add("selected"); }
+    };
+    makeDraggable(el, "#intf .dropzone", (chip, zone) => {
+      fillIntfSlot(+zone.dataset.row, +chip.dataset.i);
+    });
+    tray.appendChild(el);
+  });
+  document.querySelectorAll("#intf .dropzone").forEach(z => {
+    z.onclick = () => {
+      const row = +z.dataset.row;
+      if (INTF.sel !== null) { fillIntfSlot(row, INTF.sel); }
+      else if (INTF.slots[row] !== null) {   // tap a filled slot to clear it
+        INTF.slots[row] = null;
+        z.innerHTML = ""; z.classList.remove("filled");
+      }
+    };
+  });
+}
+function fillIntfSlot(row, choice) {
+  INTF.slots[row] = choice;
+  const zone = document.querySelector("#intf .dropzone[data-row='" + row + "']");
+  zone.innerHTML = "";
+  tex(zone, INTF.choices[choice]);
+  zone.classList.add("filled");
+}
+function checkIntf() {
+  const v = document.getElementById("intf-verdict");
+  if (INTF.slots.some(s => s === null)) {
+    v.textContent = "Fill all five slots first."; v.className = "verdict bad"; return;
+  }
+  const wrongRows = INTF.key.map((k, i) => INTF.slots[i] !== k ? i : -1).filter(i => i >= 0);
+  if (wrongRows.length === 0) {
+    v.textContent = "Correct!";
+    v.className = "verdict good";
+    document.getElementById("intf-expert").classList.add("show");
+    clearHint("intf");
+  } else {
+    v.textContent = "Not accepted yet — try again.";
+    v.className = "verdict bad";
+    // hint keyed to the kind of row that's wrong
+    let hint;
+    if (wrongRows.includes(1) || wrongRows.includes(3)) {
+      hint = `<b>Hint:</b> At 120° or 240° out of phase, the waves only <em>partially</em> cancel —
+        the result is between complete cancellation and complete reinforcement.
+        Of the three choices, which one lies strictly in between?`;
+    } else if (wrongRows.includes(2)) {
+      hint = `<b>Hint:</b> At 180° out of phase, every crest of one wave lands on a trough of
+        the other. The two displacements are equal and opposite everywhere — what's the sum?`;
+    } else {
+      hint = `<b>Hint:</b> At 0° or 360° out of phase, crests land on crests: the two
+        displacements add everywhere. Two waves of amplitude $A$ in step make a wave of
+        what amplitude?`;
+    }
+    showHint("intf", hint);
+    renderMathIn(document.getElementById("intf-hint"));
+  }
+}
+function resetIntf() {
+  INTF.slots = [null, null, null, null, null];
+  INTF.sel = null;
+  document.querySelectorAll("#intf .dropzone").forEach(z => { z.innerHTML = ""; z.classList.remove("filled"); });
+  document.querySelectorAll("#intf-tray .chip").forEach(x => x.classList.remove("selected"));
+  document.getElementById("intf-verdict").textContent = "";
+  document.getElementById("intf-expert").classList.remove("show");
+  clearHint("intf");
+}
+
+/* render $...$ inside dynamically-added hint HTML */
+function renderMathIn(el) {
+  el.innerHTML = el.innerHTML.replace(/\$([^$]+)\$/g, (m, s) => {
+    try { return katex.renderToString(s, {throwOnError: false}); } catch (e) { return m; }
+  });
+}
+
+/* =========================================================================
+   Init (KaTeX loads deferred, so build math-bearing widgets after load)
+   ========================================================================= */
+window.addEventListener("DOMContentLoaded", () => {
+  buildBins("road");
+  buildConnect("falcon");
+  // KaTeX may not be defined until its deferred script runs; poll briefly.
+  const t = setInterval(() => {
+    if (window.katex) {
+      clearInterval(t);
+      buildBins("lav");
+      buildIntf();
+    }
+  }, 50);
+});
 window.addEventListener("resize", () => drawWires("falcon"));
 </script>
 </body>
