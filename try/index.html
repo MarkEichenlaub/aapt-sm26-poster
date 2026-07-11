@@ -51,12 +51,10 @@
     font-weight: 600; font-size: 0.92rem; touch-action: none;
   }
   .chip.selected { background: var(--navy); color: #fff; }
-  .chip.dragging { opacity: 0.4; }
   .chip.mathchip { border-radius: 10px; padding: 6px 10px; }
   .dragghost {
-    position: fixed; pointer-events: none; z-index: 1000; opacity: 0.9;
-    background: #fff; border: 2px solid var(--navy); color: var(--navy);
-    padding: 5px 12px; border-radius: 99px; font-weight: 600; font-size: 0.92rem;
+    position: fixed !important; pointer-events: none; z-index: 1000; opacity: 0.95;
+    margin: 0 !important;
   }
   .bins { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
   .bin {
@@ -175,7 +173,7 @@
   <div class="expert" id="falcon-expert">
     <strong>What students are doing:</strong> translating a physical story into qualitative features of curves.
     Speed grows and saturates. The magnitude of acceleration starts at <em>g</em> and dies away.
-    Height falls ever faster, then at a steady rate. Nothing to plug in — and only one matching survives.
+    Height falls ever faster, then at a steady rate.
   </div>
 </section>
 
@@ -183,9 +181,10 @@
 <section class="card" id="pend">
   <span class="kicker">Predict an experiment</span><span class="coursechip">Introduction to Physics · Conservation Laws</span>
   <h2>Where does the pendulum stop?</h2>
-  <p class="prompt">A pendulum swings back and forth. A thin peg is suddenly inserted directly
-    beneath the pivot. When the string hits the peg, the peg becomes the new pivot.
-    <strong>Click on the point</strong> where the bob stops and turns around.
+  <p class="prompt">A pendulum is released from rest at the <strong>right-hand end of the dotted
+    arc</strong> (shown faintly) and swings back and forth along it. A thin peg is suddenly
+    inserted directly beneath the pivot. When the string hits the peg, the peg becomes the
+    new pivot. <strong>Click on the point</strong> where the bob stops and turns around.
     Your click marks a small circle: you're claiming the stopping point is inside it.
     (Assume an ideal pendulum.)</p>
   <figure>
@@ -195,6 +194,10 @@
       <!-- original swing arc (dotted) -->
       <path d="M 158.5 208.5 A 220 220 0 0 0 441.5 208.5" fill="none" stroke="#22303f"
             stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"/>
+      <!-- release position, drawn faintly: string + open bob at the arc's right end -->
+      <line x1="300" y1="40" x2="441.5" y2="208.5" stroke="#b6c0cc" stroke-width="1.8"/>
+      <circle cx="441.5" cy="208.5" r="12" fill="none" stroke="#b6c0cc" stroke-width="2"/>
+      <text x="459" y="213" font-size="15" fill="#8a97a8">start</text>
       <!-- string, descended toward vertical, right of vertical -->
       <line x1="300" y1="40" x2="360.6" y2="251.5" stroke="#22303f" stroke-width="2"/>
       <!-- bob -->
@@ -202,8 +205,8 @@
       <!-- pivot -->
       <circle cx="300" cy="40" r="3.5" fill="#22303f"/>
       <!-- peg -->
-      <circle cx="300" cy="156.6" r="7" fill="#8c5427" stroke="#5a3517" stroke-width="1.5"/>
-      <text x="286" y="161" text-anchor="end" font-size="17" fill="#5a3517">peg</text>
+      <circle cx="300" cy="156.6" r="5" fill="#8c5427" stroke="#5a3517" stroke-width="1.5"/>
+      <text x="288" y="161" text-anchor="end" font-size="17" fill="#5a3517">peg</text>
       <!-- feedback layer (drawn by JS) -->
       <g id="pend-feedback"></g>
       <!-- student's committed circle -->
@@ -236,8 +239,11 @@
     Think about which part of the water's path it's most important to match, and fit that part as well as you can.</p>
   <figure>
     <span class="clickwrap" id="fountain-wrap" style="cursor:default; max-width:560px; display:inline-block; position:relative;">
-      <img src="../assets/img/fountain_fit_crop.jpg" id="fountain-img" alt="Fountain arc over a river with axes overlay" style="display:block; width:100%;">
-      <svg id="fountain-svg" viewBox="0 0 1062 1055" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
+      <img src="../assets/img/fountain_centered.jpg" id="fountain-img" alt="Fountain arc over a river" style="display:block; width:100%;">
+      <svg id="fountain-svg" viewBox="0 0 1288 1255" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;">
+        <g id="fountain-grid"></g>
+        <g id="fountain-curve"></g>
+      </svg>
     </span>
   </figure>
   <div class="checkrow">
@@ -294,8 +300,9 @@
   <span class="kicker">Interpret an expression</span><span class="coursechip">Introduction to Physics · Dimensional Analysis</span>
   <h2>Length, area, or volume?</h2>
   <p class="prompt">Every <span style="color:var(--red); font-weight:700;">red</span> variable below is a
-    length of some kind — <em>a</em> might be a side length, <em>r</em> a radius. (π is just a number;
-    it has no dimensions.) You don't need to know where these expressions come from: just from how the
+    length of some kind — <em style="color:var(--red)">a</em> might be a side length,
+    <em style="color:var(--red)">r</em> a radius. (π is just a number; it has no dimensions.)
+    You don't need to know where these expressions come from: just from how the
     lengths are added, multiplied, squared, and square-rooted, classify each expression as a length,
     an area, or a volume.
     <em>Drag each expression to a bin (or tap it, then the bin).</em></p>
@@ -370,42 +377,68 @@ function clearHint(id) {
   hintCount[id] = 0;
 }
 
-/* Generic pointer-drag: call makeDraggable(el, dropSelector, onDrop).
-   Also leaves click behavior alone (drag only starts after 6px movement). */
-function makeDraggable(el, dropSelector, onDrop) {
+/* Generic pointer-drag: call makeDraggable(el, dropSelector, onDrop, opts).
+   Click behavior is left alone (a drag only starts after 6px of movement).
+   Default ("move") mode: the original disappears and a ghost of it rides
+   under the pointer. opts {mode:"wire", wiresId, containerId}: the original
+   stays put and a live line is drawn from it to the pointer instead. */
+function makeDraggable(el, dropSelector, onDrop, opts = {}) {
   el.addEventListener("pointerdown", (e) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 && e.pointerType === "mouse") return;
     const startX = e.clientX, startY = e.clientY;
-    let ghost = null, dragging = false, lastTarget = null;
+    let ghost = null, wire = null, dragging = false, lastTarget = null;
 
     const move = (ev) => {
       if (!dragging && Math.hypot(ev.clientX - startX, ev.clientY - startY) < 6) return;
       if (!dragging) {
         dragging = true;
-        el.classList.add("dragging");
-        ghost = document.createElement("span");
-        ghost.className = "dragghost";
-        ghost.innerHTML = el.innerHTML;
-        document.body.appendChild(ghost);
+        if (opts.mode === "wire") {
+          const svg = document.getElementById(opts.wiresId);
+          const box = document.getElementById(opts.containerId).getBoundingClientRect();
+          const r = el.getBoundingClientRect();
+          wire = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          wire.setAttribute("x1", (el.dataset.side === "L" ? r.right : r.left) - box.left);
+          wire.setAttribute("y1", r.top + r.height / 2 - box.top);
+          wire.setAttribute("x2", ev.clientX - box.left);
+          wire.setAttribute("y2", ev.clientY - box.top);
+          wire.setAttribute("stroke", "#1b365d");
+          wire.setAttribute("stroke-width", "3.5");
+          wire.setAttribute("stroke-dasharray", "7 6");
+          svg.appendChild(wire);
+        } else {
+          ghost = el.cloneNode(true);
+          ghost.classList.add("dragghost");
+          ghost.classList.remove("selected");
+          document.body.appendChild(ghost);
+          el.style.visibility = "hidden";   // only the ghost under the pointer remains visible
+        }
       }
-      ghost.style.left = (ev.clientX + 8) + "px";
-      ghost.style.top = (ev.clientY + 10) + "px";
+      if (ghost) {
+        ghost.style.left = (ev.clientX - ghost.offsetWidth / 2) + "px";
+        ghost.style.top = (ev.clientY - ghost.offsetHeight / 2) + "px";
+      }
+      if (wire) {
+        const box = document.getElementById(opts.containerId).getBoundingClientRect();
+        wire.setAttribute("x2", ev.clientX - box.left);
+        wire.setAttribute("y2", ev.clientY - box.top);
+      }
       const under = document.elementFromPoint(ev.clientX, ev.clientY);
       const target = under ? under.closest(dropSelector) : null;
       if (lastTarget && lastTarget !== target) lastTarget.classList.remove("dragover");
-      if (target) target.classList.add("dragover");
+      if (target && target !== el) target.classList.add("dragover");
       lastTarget = target;
     };
     const up = (ev) => {
       document.removeEventListener("pointermove", move);
       document.removeEventListener("pointerup", up);
       if (ghost) ghost.remove();
-      el.classList.remove("dragging");
+      if (wire) wire.remove();
+      el.style.visibility = "";
       if (lastTarget) lastTarget.classList.remove("dragover");
       if (dragging) {
         const under = document.elementFromPoint(ev.clientX, ev.clientY);
         const target = under ? under.closest(dropSelector) : null;
-        if (target) onDrop(el, target);
+        if (target && target !== el) onDrop(el, target);
         // swallow the click that follows a drag
         el.addEventListener("click", (ce) => ce.stopPropagation(), {capture: true, once: true});
       }
@@ -467,7 +500,7 @@ const BIN_PROBLEMS = {
     key: { 0: 0, 1: 2, 2: 1, 3: 1, 4: 1, 5: 2 },
     math: true,
     hints: [
-      `<b>Hint (from the AoPS course):</b> Try replacing every red variable by
+      `<b>Hint:</b> Try replacing every red variable by
        $\\mathrm{L}$ and ignoring the constants. For example,
        $\\dfrac{8\\pi}{3d}\\left(r_1^3-r_2^3\\right)$ becomes
        $\\dfrac{1}{\\mathrm{L}}(\\mathrm{L}^3-\\mathrm{L}^3)$. Remember that
@@ -563,10 +596,10 @@ const CONNECT_PROBLEMS = {
     left: [{ img: "../asy/falcon_a.svg" }, { img: "../asy/falcon_v.svg" }, { img: "../asy/falcon_y.svg" }],
     right: ["height", "speed", "magnitude of acceleration"],
     key: { 0: 2, 1: 1, 2: 0 },   // |a|->acceleration, v->speed, y->height
-    hint: `<b>Hint (from the AoPS course):</b> First, think about whether each plot should begin
-      at some higher value and decrease, or begin at zero and increase. Then think about what
-      happens as the bird approaches terminal velocity: does the plot level off toward a
-      horizontal asymptote, or approach a straight line?`
+    hint: `<b>Hint:</b> First, think about whether each plot should begin at some higher value
+      and decrease, or begin at zero and increase. Then think about what happens as the falcon
+      approaches terminal velocity: does the plot level off toward a horizontal asymptote,
+      or approach a straight line?`
   }
 };
 const connState = {};
@@ -588,7 +621,7 @@ function buildConnect(id) {
       connState[id].pairs[l] = r;
       if (connState[id].sel) { connState[id].sel.classList.remove("selected"); connState[id].sel = null; }
       drawWires(id);
-    });
+    }, {mode: "wire", wiresId: id + "-wires", containerId: id + "-connect"});
     return el;
   };
   p.left.forEach((t, i) => L.appendChild(makeItem(t, i, "L")));
@@ -689,13 +722,28 @@ function checkPend() {
   fb.innerHTML = "";
   const NS = "http://www.w3.org/2000/svg";
   if (pendDist(pendClick, PEND.T) < PEND.tol) {
-    // correct: draw the exact answer as a dot inside the student's circle
+    // correct: draw the two constraints that locate the answer, then the answer itself.
+    // Constraint 1 (energy): the release-height line across the big arc.
+    const hline = document.createElementNS(NS, "line");
+    hline.setAttribute("x1", 158.5); hline.setAttribute("y1", 208.5);
+    hline.setAttribute("x2", 441.5); hline.setAttribute("y2", 208.5);
+    hline.setAttribute("stroke", "#61ad00"); hline.setAttribute("stroke-width", "2");
+    hline.setAttribute("stroke-dasharray", "3 6");
+    fb.appendChild(hline);
+    // Constraint 2 (string): the tighter arc about the peg, sharing the big arc's bottom.
+    const parc = document.createElementNS(NS, "path");
+    parc.setAttribute("d", "M 300 260 A 103.4 103.4 0 0 1 198.2 174.6");
+    parc.setAttribute("fill", "none");
+    parc.setAttribute("stroke", "#61ad00"); parc.setAttribute("stroke-width", "2");
+    parc.setAttribute("stroke-dasharray", "8 6");
+    fb.appendChild(parc);
+    // The stopping point: where the two constraints cross.
     const [tx, ty] = PEND.toSvg(PEND.T.x, PEND.T.y);
     const dot = document.createElementNS(NS, "circle");
     dot.setAttribute("cx", tx); dot.setAttribute("cy", ty); dot.setAttribute("r", 6);
     dot.setAttribute("fill", "#61ad00");
     fb.appendChild(dot);
-    v.textContent = "Correct! The exact stopping point is the green dot inside your circle.";
+    v.textContent = "Correct! The bob stops where the release-height line meets the tighter arc around the peg.";
     v.className = "verdict good";
     document.getElementById("pend-expert").classList.add("show");
     clearHint("pend");
@@ -742,11 +790,11 @@ function checkPend() {
     fb.appendChild(line);
     v.textContent = "Not in that circle.";
     v.className = "verdict bad";
-    showHint("pend", `<b>Hint (from the AoPS course):</b> There are two conservation laws at play
-      here — energy conservation, and the "conservation of string." Without the peg, energy
-      conservation means the bob always rises to the same height on either side (the dotted
-      horizontal line just drawn). The peg doesn't change the bob's energy… but it does change
-      which circle the bob moves along.`);
+    showHint("pend", `<b>Hint:</b> There are two conservation laws at play here — energy
+      conservation, and the "conservation of string." Without the peg, energy conservation
+      means the bob always rises to the same height on either side (the dotted horizontal
+      line just drawn). The peg doesn't change the bob's energy… but it does change which
+      circle the bob moves along.`);
   }
 }
 function resetPend() {
@@ -761,8 +809,33 @@ function resetPend() {
 /* =========================================================================
    Fountain parabola fit — the student drives the red parabola; no target
    =========================================================================
-   Mapping: origin (527.5, 531.0) px, 347.8 px per 10 m, in the 1062x1055 image. */
-const FTN = { ox: 527.5, oy: 531.0, U: 347.8, W: 1062, H: 1055 };
+   The photo has no overlay baked in; we draw the grid and axes ourselves.
+   Mapping: the image spans -1.5..1.5 (units of 10 m) on both axes, so the
+   origin sits at the center and one unit is W/3 px across, H/3 px down. */
+const FTN = { W: 1288, H: 1255 };
+FTN.ox = FTN.W / 2; FTN.oy = FTN.H / 2;
+FTN.Ux = FTN.W / 3; FTN.Uy = FTN.H / 3;
+function drawFountainGrid() {
+  const g = [];
+  // faint white gridlines every 0.1 unit (1 m)
+  for (let i = -15; i <= 15; i++) {
+    const x = FTN.ox + i * FTN.Ux / 10;
+    const y = FTN.oy + i * FTN.Uy / 10;
+    g.push("<line x1='" + x + "' y1='0' x2='" + x + "' y2='" + FTN.H + "' stroke='#fff' stroke-width='1.4' opacity='0.35'/>");
+    g.push("<line x1='0' y1='" + y + "' x2='" + FTN.W + "' y2='" + y + "' stroke='#fff' stroke-width='1.4' opacity='0.35'/>");
+  }
+  // solid white axes through the origin, with tick marks every 1 m
+  g.push("<line x1='" + FTN.ox + "' y1='0' x2='" + FTN.ox + "' y2='" + FTN.H + "' stroke='#fff' stroke-width='5'/>");
+  g.push("<line x1='0' y1='" + FTN.oy + "' x2='" + FTN.W + "' y2='" + FTN.oy + "' stroke='#fff' stroke-width='5'/>");
+  for (let i = -15; i <= 15; i++) {
+    if (i === 0) continue;
+    const x = FTN.ox + i * FTN.Ux / 10;
+    const y = FTN.oy + i * FTN.Uy / 10;
+    g.push("<line x1='" + x + "' y1='" + (FTN.oy - 12) + "' x2='" + x + "' y2='" + (FTN.oy + 12) + "' stroke='#fff' stroke-width='4'/>");
+    g.push("<line x1='" + (FTN.ox - 12) + "' y1='" + y + "' x2='" + (FTN.ox + 12) + "' y2='" + y + "' stroke='#fff' stroke-width='4'/>");
+  }
+  document.getElementById("fountain-grid").innerHTML = g.join("");
+}
 function drawFountain() {
   const a = parseFloat(document.getElementById("fountain-a").value);
   const b = parseFloat(document.getElementById("fountain-b").value);
@@ -770,13 +843,14 @@ function drawFountain() {
   document.getElementById("fountain-bval").textContent = b.toFixed(2);
   const pts = [];
   for (let px = 0; px <= FTN.W; px += 6) {
-    const x10 = (px - FTN.ox) / FTN.U;
-    const py = FTN.oy - FTN.U * (a * x10 * x10 + b);
+    const x10 = (px - FTN.ox) / FTN.Ux;
+    const py = FTN.oy - FTN.Uy * (a * x10 * x10 + b);
     if (py >= -40 && py <= FTN.H + 40) pts.push(px.toFixed(0) + "," + py.toFixed(1));
   }
-  document.getElementById("fountain-svg").innerHTML =
+  document.getElementById("fountain-curve").innerHTML =
     "<polyline points='" + pts.join(" ") + "' fill='none' stroke='#e8262d' stroke-width='7'/>";
 }
+drawFountainGrid();
 function checkFountain() {
   const a = parseFloat(document.getElementById("fountain-a").value);
   const b = parseFloat(document.getElementById("fountain-b").value);
@@ -839,10 +913,9 @@ function checkObscura() {
   } else {
     v.textContent = "Not accepted yet — try again.";
     v.className = "verdict bad";
-    showHint("obscura", `<b>Hint (from the AoPS course):</b> A camera obscura rotates images by
-      180°. Try writing each letter on paper and rotating the paper 180° — which letters look
-      the same afterward? (An E can look normal in a gallery photo of a camera obscura, but
-      answer from your understanding of pinhole images, not from a photo.)`);
+    showHint("obscura", `<b>Hint:</b> Flipping an image upside down <em>and</em> left–right is
+      the same as rotating it 180°. Try writing each letter on paper and turning the paper
+      180° — which letters look the same afterward?`);
   }
 }
 function resetObscura() {

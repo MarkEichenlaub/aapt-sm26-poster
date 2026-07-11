@@ -12,7 +12,7 @@ pair E = (0,-0.53);
 draw((-0.78,0)--(0.78,0), linewidth(1.6pt));
 
 // swing arc
-draw(arc(A,1,-90-theta,-90+theta), dotted);
+draw(arc(A,1,-90-theta,-90+theta), dotted+linewidth(1.5pt));
 
 // string
 draw(A--bob, linewidth(0.9pt));
