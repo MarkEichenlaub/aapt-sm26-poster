@@ -1,0 +1,20 @@
+Kepler 452b is an exoplanet renowned for its similarity to Earth. It is about $1{,}800$ light-years from Earth, in the constellation Cygnus. Its star is similar to the Sun, and it's distance from its star is similar to Earth's distance from the Sun.
+
+Although astronomers' estimates of the mass and radius of Kepler 452b are still substantially uncertain, for this problem, assume
+$$\begin{aligned}
+g_{K} & = 2 g_E \\
+m_{K} & = 5 m_E
+\end{aligned}$$
+where the subscript $K$ refers to Kepler 452b and $E$ refers to Earth.
+
+Finally, assume that the orbital period for satellites in low-Earth orbit is
+$$T_E = 90 \;\mathrm{min}$$
+This means that a satellite orbiting just above the surface of Earth would take 90 minutes to go all the way around.
+
+(Real satellites are a few hundred kilometers above Earth's surface, not directly at the surface, but that elevation is small compared to the radius of Earth, and we'll ignore it for this problem.)
+
+Given these assumptions, what is $T_{K},$ the period of a satellite just above the surface of Kepler 452b?
+
+You only need the information given in the equations above for this problem, plus knowledge of the inverse square law and an understanding of circular orbits. You don't need to look up the mass of the Earth, the value of $G,$ etc.
+
+Contribute your ideas and build off your classmates' work to find an answer.
