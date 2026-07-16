@@ -71,10 +71,9 @@
   .courselist li { font-size: 21.5pt; line-height: 1.42; }
   .courselist li::marker { color: var(--green); }
   .courselist li span { color: var(--muted); }
-  .thesis {
-    margin-top: 0.2in; background: #fff; border-left: 0.12in solid var(--green);
-    border-radius: 0 0.12in 0.12in 0; padding: 0.16in 0.22in;
-    font-size: 24pt; line-height: 1.32; font-weight: 600; color: var(--navy);
+  .lead {
+    font-size: 25pt; line-height: 1.3; font-weight: 700; color: var(--navy);
+    margin: 0.02in 0 0.1in 0.02in;
   }
 
   /* find-the-blank graphic */
@@ -205,6 +204,7 @@
 <main>
   <!-- ================= LEFT RAIL ================= -->
   <div class="rail">
+    <p class="lead">Automatic grading limits the type of response the student can give — not the type of thinking they can do.</p>
     <div class="panel">
       <h2>AoPS Physics</h2>
       <p class="statline"><b class="num">~1,000</b> students per year take our online physics courses:</p>
@@ -217,16 +217,12 @@
       </ul>
       <p class="statline"><b class="num">~700</b> homework problem submissions per day.
         Most homework is graded automatically.</p>
-      <div class="thesis">Automatic grading limits the type of response the student can give
-        — not the type of thinking they can do.</div>
     </div>
 
     <div class="panel">
       <h2>The Default Ask</h2>
-      <p>Homework that grades itself usually presents a scenario and asks for one quantity.
-         Such problems build mastery and tenacity — but a steady diet of them trains a
-         narrow, procedural picture of what doing physics <i>is</i>:
-         pick the equation, plug in, solve.</p>
+      <p>Too many problems asking students to compute a quantity train a narrow,
+         procedural view of physics.</p>
       <div class="findstack">
         <div>Find the tension in the rope.</div>
         <div>Find the time to reach the ground.</div>
@@ -239,8 +235,8 @@
     <div class="panel green" style="flex:1 1 auto; display:flex; flex-direction:column; min-height:0;">
       <h2>Rich Interaction, Simple Output</h2>
       <p>An auto-grader can check any answer with a well-defined key, not just numbers.
-         Build the problems so students interact in different ways, depending on the
-         thinking they're doing. Examples:</p>
+         <b>Build the problems so students interact in different ways, depending on the
+         thinking they're doing.</b> Examples:</p>
       <div class="motorgrid">
         <div class="motor">
           <h4>Connecting columns</h4>
@@ -415,8 +411,8 @@
 
     <div class="panel">
       <h2>What human graders are doing</h2>
-      <p>Human feedback is a precious resource. We spend it where nuance pays most — often
-         labs. In human-graded problems, students are:</p>
+      <p>Human feedback is a precious resource. We spend it where students gain the most
+         from someone noticing the nuances. In human-graded problems, students are:</p>
       <div class="humangroups">
         <div>
           <h4>Describing</h4>
@@ -438,6 +434,7 @@
           <h4>Solving</h4>
           <ul>
             <li>a multi-step problem</li>
+            <li>a problem with rich context</li>
           </ul>
         </div>
         <div>
